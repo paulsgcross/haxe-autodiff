@@ -105,7 +105,18 @@ class AD {
     static function performForwardTrace(func : Function) : Function {
         var newExpressions : Array<Expr> = new Array();
         var expr = func.expr;
-
+        var newArgs = new Array();
+        for(arg in func.args) {
+            newArgs.push(arg);
+            newArgs.push({
+                name: 'd' + arg.name,
+                opt: arg.opt,
+                meta: arg.meta,
+                type: arg.type
+            });
+        }
+        func.args = newArgs;
+        
         index = 0;
         switch(expr.expr) {
             case EBlock(exprs):
@@ -149,9 +160,9 @@ class AD {
 
                 return createIntermediateVar(def, expressions);
             case ECall(e, params):
-                var exp1 = processExpression(params[0], expressions);
-                var def = ECall(e, [exp1]);
-
+                var array = params.copy();
+                array[0] = processExpression(array[0], expressions);
+                var def = ECall(e, array);
                 return createIntermediateVar(def, expressions);
             case EParenthesis(e):
                 return processExpression(e, expressions);
