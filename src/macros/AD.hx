@@ -112,8 +112,14 @@ class AD {
                 for(expression in exprs) {
                     switch(expression.expr) {
                         case EVars(vars):
-                            var newExpr = processExpression(vars[0].expr, newExpressions);
-                            newExpressions.push(createNewVariable(vars[0].name, newExpr));
+                            var name = vars[0].name;
+                            processExpression(vars[0].expr, newExpressions);
+                            var newExpr = newExpressions.pop();
+                            switch(newExpr.expr) {
+                                case EVars(var_out):
+                                    newExpressions.push(createNewVariable(name, var_out[0].expr));
+                                default:
+                            }
                         default:
                             newExpressions.push(expression);
                     }
@@ -134,7 +140,6 @@ class AD {
     }
 
     static function processExpression(expression : Expr, expressions : Array<Expr>) : Expr {
-        trace(expression.expr);
         switch(expression.expr) {
             case EBinop(op, e1, e2):
                 
