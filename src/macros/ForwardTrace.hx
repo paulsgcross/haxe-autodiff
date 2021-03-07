@@ -24,12 +24,14 @@ class ForwardTrace {
         index = 0;
         switch(expr.expr) {
             case EBlock(exprs):
+                trace(exprs);
                 for(expression in exprs) {
                     switch(expression.expr) {
+                        case EBinop(op, e1, e2):
+                            
                         case EVars(vars):
                             var name = vars[0].name;
                             processExpression(vars[0].expr, newExpressions);
-
                             var dt = newExpressions.pop();
                             var t = newExpressions.pop();
                             

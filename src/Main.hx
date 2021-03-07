@@ -1,8 +1,8 @@
 class Main {
   static function main() {
 
-    trace(Test.func1(3));
-    trace(Test.func1_diff(3, 1.0));
+    trace(Test.func1(3, 3));
+    //trace(Test.func1_diff(3, 1.0, 3, 0.0));
     while(true) {
 
     }
@@ -21,8 +21,8 @@ class Test {
   }
 */
  
-public static function func1(x1 : Float) : Float {
-    return Math.abs(5*x1);
+public static function func1(x1 : Float, x2 : Float) : Float {
+    return x1*2;
   }
 
 }

@@ -22,11 +22,11 @@ class AD {
             newFields.push(field);
             switch(field.kind) {
                 case FieldType.FFun(fn):
-                    var newFn = processFunctionReturns(fn);
+                    var newFn = processFunction(fn);
                     var newField : Field = {
                         name: field.name + "_diff",
                         access: field.access,
-                        kind: FieldType.FFun(method(newFn)),
+                        kind: FieldType.FFun((newFn)),
                         pos: Context.currentPos()
                     };
                     newFields.push(newField);
@@ -37,7 +37,7 @@ class AD {
         return newFields;
     }
 
-    static function processFunctionReturns(func : Function) : Function {
+    static function processFunction(func : Function) : Function {
         var newExpressions : Array<Expr> = new Array();
         var expr = func.expr;
         var index = 0;
@@ -46,6 +46,46 @@ class AD {
                 for(expression in exprs) {
                     var def = expression.expr;
                     switch(def) {
+                        case EVars(vars):
+                            var variable = vars[0];
+                            switch(variable.expr.expr) {
+                                case EConst(c):
+                                    switch(c) {
+                                        case CFloat(f) | CInt(f):
+                                            newExpressions.push(expression);
+                                            continue;
+                                        default:
+                                    }
+                                default:
+                            }
+
+                            var newVarName = {
+                                pos: Context.currentPos(),
+                                expr: EConst(CIdent(variable.name))
+                            }
+
+                            var newVar = {
+                                pos: Context.currentPos(),
+                                expr: EConst(CFloat('0.0'))
+                            }
+
+                            var newExpr = {
+                                pos: Context.currentPos(),
+                                expr: EVars([{
+                                    name: variable.name,
+                                    isFinal: variable.isFinal,
+                                    expr: newVar,
+                                    type: variable.type
+                                }])
+                            };
+
+                            var newAssign = {
+                                pos: Context.currentPos(),
+                                expr: EBinop(Binop.OpAssign, newVarName, variable.expr)
+                            };
+
+                            newExpressions.push(newExpr);
+                            newExpressions.push(newAssign);
                         case EReturn(expr):
                             switch (expr.expr) {
                                 case EConst(c):
