@@ -22,6 +22,7 @@ class Derivitive {
                 return handleCall(e, params);
             default:
         }
+
         return {
             pos: Context.currentPos(),
             expr: def
@@ -29,35 +30,228 @@ class Derivitive {
     }
 
     static function handleCall(expr : Expr, params : Array<Expr>) : Expr {
-        return expr;
+        var funcExpr = handleFunctions(expr, params);
+        
+        return funcExpr;
+    }
+
+    static function handleFunctions(expr : Expr, params : Array<Expr>) : Expr {
         var def = expr.expr;
-        switch(expr.expr) {
+        switch(def) {
             case EField(e, field):
-                handleFunctions(field, params);
-            case EConst(c):
-                switch(c) {
-                    case CIdent(s):
-                        handleFunctions(s, params);
-                    default:
+                switch(field) {
+                    case 'sin':
+                        return handleSine(e, params);
+                    case 'cos':
+                        return handleCosine(e, params);
+                    case 'tan':
+                        return handleTan(e, params);
+                    case 'pow':
+                        return handlePow(e, params);
+                    case 'exp':
+                        return handleExp(e, params);
+                    case 'log':
+                        return handleLog(e, params);
+                    case 'sqrt':
+                        return handleSqrt(e, params);
                 }
             default:
         }
 
+        var expr = {
+            pos: Context.currentPos(),
+            expr: ECall(expr, params)
+        };
+
         return expr;
     }
-
-    static function handleFunctions(name : String, params : Array<Expr>) : ExprDef {
-        trace(name);
-        switch(name) {
-            case 'cos':
-            case 'sin':
-            case 'tan':
-            case 'pow':
-            case 'sqrt':
-            case 'exp':
-            case 'log':
+    
+    static function handleSqrt(expression : Expr, params : Array<Expr>) : Expr {
+        var newField = {
+            pos: Context.currentPos(),
+            expr: EField(expression, 'sqrt')
         }
-        return EConst(CIdent(name));
+
+        var newFunc = {
+            pos: Context.currentPos(),
+            expr: ECall(newField, params)
+        };
+
+        var recipExpr = {
+            pos: Context.currentPos(),
+            expr: EBinop(OpDiv, makeDeltaExpression(params[0]), newFunc)
+        };
+
+        var halfExpr = {
+            pos: Context.currentPos(),
+            expr: EConst(CFloat('0.5'))
+        };
+
+        var newExpr = {
+            pos: Context.currentPos(),
+            expr: EBinop(OpMult, halfExpr, recipExpr)
+        };
+
+        return newExpr;
+    }
+
+    static function handleLog(expression : Expr, params : Array<Expr>) : Expr {
+        var newExpr = {
+            pos: Context.currentPos(),
+            expr: EBinop(OpDiv, makeDeltaExpression(params[0]), params[0])
+        };
+
+        return newExpr;
+    }
+
+    static function handlePow(expression : Expr, params : Array<Expr>) : Expr {
+        var newParams = params.copy();
+        var newParam = {
+            pos: Context.currentPos(),
+            expr: EBinop(OpSub, params[1], {
+                pos: Context.currentPos(),
+                expr: EConst(CInt('1'))
+            })
+        };
+
+        newParams[1] = newParam;
+
+        var newField = {
+            pos: Context.currentPos(),
+            expr: EField(expression, 'pow')
+        }
+
+        var newFunc = {
+            pos: Context.currentPos(),
+            expr: ECall(newField, newParams)
+        };
+
+        var dExpr = {
+            pos: Context.currentPos(),
+            expr: EBinop(OpMult, params[1], newFunc)
+        };
+
+        var newExpr = {
+            pos: Context.currentPos(),
+            expr: EBinop(OpMult, dExpr, makeDeltaExpression(params[0]))
+        };
+
+        return newExpr;
+    }
+
+    static function handleTan(expression : Expr, params : Array<Expr>) : Expr {
+        var one = {
+            pos: Context.currentPos(),
+            expr: EConst(CFloat('1.0'))
+        };
+
+        var two = {
+            pos: Context.currentPos(),
+            expr: EConst(CFloat('2.0'))
+        };
+
+        var newField = {
+            pos: Context.currentPos(),
+            expr: EField(expression, 'tan')
+        }
+
+        var newCall = {
+            pos: Context.currentPos(),
+            expr: ECall(newField, params)
+        };
+
+        var powField = {
+            pos: Context.currentPos(),
+            expr: EField(expression, 'pow')
+        }
+
+        var powCall = {
+            pos: Context.currentPos(),
+            expr: ECall(powField, [newCall, two])
+        };
+
+        var plusFunc = {
+            pos: Context.currentPos(),
+            expr: EBinop(OpAdd, one, powCall)
+        };
+
+        var newExpr = {
+            pos: Context.currentPos(),
+            expr: EBinop(OpMult, plusFunc, makeDeltaExpression(params[0]))
+        };
+
+        return newExpr;
+    }
+
+    static function handleSine(expression : Expr, params : Array<Expr>) : Expr {
+        var newField = {
+            pos: Context.currentPos(),
+            expr: EField(expression, 'cos')
+        }
+
+        var newFunc = {
+            pos: Context.currentPos(),
+            expr: ECall(newField, params)
+        };
+
+        var newExpr = {
+            pos: Context.currentPos(),
+            expr: EBinop(OpMult, newFunc, makeDeltaExpression(params[0]))
+        };
+
+        return newExpr;
+    }
+
+    static function handleCosine(expression : Expr, params : Array<Expr>) : Expr {
+        var newField = {
+            pos: Context.currentPos(),
+            expr: EField(expression, 'sin')
+        }
+
+        var newFunc = {
+            pos: Context.currentPos(),
+            expr: ECall(newField, params)
+        };
+
+        var newExpr = {
+            pos: Context.currentPos(),
+            expr: EBinop(OpMult, newFunc, makeDeltaExpression(params[0]))
+        };
+
+        var negExpr = {
+            pos: Context.currentPos(),
+            expr: EUnop(Unop.OpNeg, false, newExpr)
+        };
+
+        return negExpr;
+    }
+
+    static function handleExp(expression : Expr, params : Array<Expr>) : Expr {
+        var newField = {
+            pos: Context.currentPos(),
+            expr: EField(expression, 'exp')
+        }
+
+        var newFunc = {
+            pos: Context.currentPos(),
+            expr: ECall(newField, params)
+        };
+
+        var newExpr = {
+            pos: Context.currentPos(),
+            expr: EBinop(OpMult, newFunc, makeDeltaExpression(params[0]))
+        };
+
+        return newExpr;
+    }
+
+    static function handleNegative(e : Expr) : Expr {
+        var expr = {
+            pos: Context.currentPos(),
+            expr: EUnop(Unop.OpNeg, false, makeDeltaExpression(e))
+        };
+
+        return expr;
     }
 
     static function handleAdditionSubtraction(op : Binop, e1 : Expr, e2 : Expr) : Expr {
@@ -99,10 +293,21 @@ class Derivitive {
             expr: EBinop(OpMult, makeDeltaExpression(e1), e2)
         };
 
+        var subExpr = {
+            pos: Context.currentPos(),
+            expr: EBinop(OpSub, rightExpr, leftExpr)
+        };
+
+        var squaredExpr = {
+            pos: Context.currentPos(),
+            expr: EBinop(OpMult, e2, e2)
+        };
+
         var newExpr = {
             pos: Context.currentPos(),
-            expr: EBinop(OpSub, leftExpr, rightExpr)
-        };
+            expr: EBinop(OpDiv, subExpr, squaredExpr)
+        }
+
         return newExpr;
     }
 
