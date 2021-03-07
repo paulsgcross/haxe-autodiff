@@ -6,6 +6,14 @@ import haxe.macro.Context;
 
 class AD {
     macro static public function buildForward() : Array<Field> {
+        return build(ForwardTrace.performForwardTrace);
+    }
+    
+    macro static public function buildBackward() : Array<Field> {
+        return build(ForwardTrace.performForwardTrace);
+    }
+
+    static function build(method : Function -> Function) : Array<Field> {
         var fields = Context.getBuildFields();
         var newFields : Array<Field> = new Array();
 
@@ -18,7 +26,7 @@ class AD {
                     var newField : Field = {
                         name: field.name + "_diff",
                         access: field.access,
-                        kind: FieldType.FFun(ForwardTrace.performForwardTrace(newFn)),
+                        kind: FieldType.FFun(method(newFn)),
                         pos: Context.currentPos()
                     };
                     newFields.push(newField);
