@@ -29,12 +29,43 @@ class ForwardTrace {
                         case EVars(vars):
                             var name = vars[0].name;
                             processExpression(vars[0].expr, newExpressions);
-                            var newExpr = newExpressions.pop();
-                            switch(newExpr.expr) {
+
+                            var dt = newExpressions.pop();
+                            var t = newExpressions.pop();
+                            
+                            switch(t.expr) {
                                 case EVars(var_out):
                                     newExpressions.push(Util.createNewVariable(name, var_out[0].expr));
                                 default:
                             }
+
+                            switch(dt.expr) {
+                                case EVars(var_out):
+                                    newExpressions.push(Util.createNewVariable('d' + name, var_out[0].expr));
+                                default:
+                            }
+                        case EReturn(e):
+                            var name = "";
+                            switch(e.expr) {
+                                case EConst(c):
+                                    switch(c) {
+                                        case CIdent(s):
+                                            name = s;
+                                        default:
+                                    }
+                                default:
+                            }
+
+                            var newDvar = {
+                                pos: Context.currentPos(),
+                                expr: EConst(CIdent('d'+name))
+                            };
+
+                            newExpressions.push({
+                                pos: Context.currentPos(), 
+                                expr: EReturn(newDvar)
+                            });
+
                         default:
                             newExpressions.push(expression);
                     }

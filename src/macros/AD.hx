@@ -8,6 +8,8 @@ class AD {
     macro static public function build() : Array<Field> {
         var fields = Context.getBuildFields();
         var newFields : Array<Field> = new Array();
+
+
         for(field in fields) {
             newFields.push(field);
             switch(field.kind) {
