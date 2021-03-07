@@ -54,6 +54,8 @@ class Derivitive {
                         return handleLog(e, params);
                     case 'sqrt':
                         return handleSqrt(e, params);
+                    case 'abs':
+                        return handleAbs(e, params);
                 }
             default:
         }
@@ -277,6 +279,30 @@ class Derivitive {
         var newExpr = {
             pos: Context.currentPos(),
             expr: EBinop(OpAdd, leftExpr, rightExpr)
+        };
+
+        return newExpr;
+    }
+
+    static function handleAbs(expression : Expr, params : Array<Expr>) : Expr {
+        var newField = {
+            pos: Context.currentPos(),
+            expr: EField(expression, 'abs')
+        }
+
+        var newFunc = {
+            pos: Context.currentPos(),
+            expr: ECall(newField, params)
+        };
+
+        var signExpr = {
+            pos: Context.currentPos(),
+            expr: EBinop(OpDiv, params[0], newFunc)
+        };
+
+        var newExpr = {
+            pos: Context.currentPos(),
+            expr: EBinop(OpMult, signExpr, makeDeltaExpression(params[0]))
         };
 
         return newExpr;

@@ -1,8 +1,8 @@
 class Main {
   static function main() {
 
-    trace(Test.func1(2));
-    trace(Test.func1_diff(2, 1.0));
+    trace(Test.func1(3));
+    trace(Test.func1_diff(3, 1.0));
     while(true) {
 
     }
@@ -10,7 +10,7 @@ class Main {
 
 }
 
-@:build(macros.AD.build())
+@:build(macros.AD.buildForward())
 class Test {
   /*
   public static function func1(x : Float) : Float {
@@ -22,8 +22,7 @@ class Test {
 */
  
 public static function func1(x1 : Float) : Float {
-    var z = Math.pow(x1, 3) + 2*Math.pow(x1, 2) - 4*x1 + 3;
-    return z;
+    return Math.abs(5*x1);
   }
 
 }

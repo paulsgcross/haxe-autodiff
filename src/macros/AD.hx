@@ -5,7 +5,7 @@ import haxe.macro.Expr;
 import haxe.macro.Context;
 
 class AD {
-    macro static public function build() : Array<Field> {
+    macro static public function buildForward() : Array<Field> {
         var fields = Context.getBuildFields();
         var newFields : Array<Field> = new Array();
 
