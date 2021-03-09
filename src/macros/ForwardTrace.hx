@@ -30,19 +30,10 @@ class ForwardTrace {
                             switch(op) {
                                 case OpAssign:
                                     processExpression(e2, newExpressions);
-                                    var dt = newExpressions.pop();
-                                    var t = newExpressions.pop();
-
-                                    var tExpr = Util.getVariableExpression(t);
-                                    var dtExpr = Util.getVariableExpression(dt);
-
-                                    var name = Util.getName(e1.expr);
-                                    var newAssign = createAssignment(name, tExpr);
-                                    newExpressions.push(newAssign);
-
-                                    var name = Util.getName(e1.expr);
-                                    var newAssign = createAssignment('d' + name, dtExpr);
-                                    newExpressions.push(newAssign);
+                                    performFinalAssignment(Util.getName(e1.expr), newExpressions);
+                                case OpAssignOp(o2):
+                                    processExpression(e2, newExpressions);
+                                    performFinalAssignment(Util.getName(e1.expr), newExpressions);
                                 default:
                             }
                         case EReturn(e):
@@ -115,6 +106,20 @@ class ForwardTrace {
             default:
                 return expression;
         }
+    }
+
+    static function performFinalAssignment(name : String, expressions : Array<Expr>) : Void {
+        var dt = expressions.pop();
+        var t = expressions.pop();
+
+        var tExpr = Util.getVariableExpression(t);
+        var dtExpr = Util.getVariableExpression(dt);
+
+        var newAssign = createAssignment(name, tExpr);
+        expressions.push(newAssign);
+
+        var newAssign = createAssignment('d' + name, dtExpr);
+        expressions.push(newAssign);
     }
 
     static function createIntermediateVar(def : ExprDef, expressions : Array<Expr>) : Expr {

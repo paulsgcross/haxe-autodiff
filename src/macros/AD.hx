@@ -52,16 +52,16 @@ class AD {
                                 case EConst(c):
                                     switch(c) {
                                         case CFloat(f) | CInt(f):
-                                            newExpressions.push(expression);
                                             createNewDVarDeclaration(variable, newExpressions);
+                                            newExpressions.push(expression);
                                             continue;
                                         default:
                                     }
                                 default:
                             }
 
-                            createNewVarDeclaration(variable, newExpressions);
                             createNewDVarDeclaration(variable, newExpressions);
+                            createNewVarDeclaration(variable, newExpressions);
                         case EReturn(expr):
                             switch (expr.expr) {
                                 case EConst(c):
