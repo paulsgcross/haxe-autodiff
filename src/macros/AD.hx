@@ -26,7 +26,7 @@ class AD {
                     var newField : Field = {
                         name: field.name + "_diff",
                         access: field.access,
-                        kind: FieldType.FFun((newFn)),
+                        kind: FieldType.FFun(ForwardTrace.performForwardTrace(newFn)),
                         pos: Context.currentPos()
                     };
                     newFields.push(newField);
@@ -53,39 +53,15 @@ class AD {
                                     switch(c) {
                                         case CFloat(f) | CInt(f):
                                             newExpressions.push(expression);
+                                            createNewDVarDeclaration(variable, newExpressions);
                                             continue;
                                         default:
                                     }
                                 default:
                             }
 
-                            var newVarName = {
-                                pos: Context.currentPos(),
-                                expr: EConst(CIdent(variable.name))
-                            }
-
-                            var newVar = {
-                                pos: Context.currentPos(),
-                                expr: EConst(CFloat('0.0'))
-                            }
-
-                            var newExpr = {
-                                pos: Context.currentPos(),
-                                expr: EVars([{
-                                    name: variable.name,
-                                    isFinal: variable.isFinal,
-                                    expr: newVar,
-                                    type: variable.type
-                                }])
-                            };
-
-                            var newAssign = {
-                                pos: Context.currentPos(),
-                                expr: EBinop(Binop.OpAssign, newVarName, variable.expr)
-                            };
-
-                            newExpressions.push(newExpr);
-                            newExpressions.push(newAssign);
+                            createNewVarDeclaration(variable, newExpressions);
+                            createNewDVarDeclaration(variable, newExpressions);
                         case EReturn(expr):
                             switch (expr.expr) {
                                 case EConst(c):
@@ -125,7 +101,58 @@ class AD {
         return newFunc;
     }
 
-    
+    static function createNewVarDeclaration(variable : Var, expressions : Array<Expr>) : Void {
+        var newVarName = {
+            pos: Context.currentPos(),
+            expr: EConst(CIdent(variable.name))
+        }
 
+        var newVar = {
+            pos: Context.currentPos(),
+            expr: EConst(CFloat('0.0'))
+        }
+
+        var newExpr = {
+            pos: Context.currentPos(),
+            expr: EVars([{
+                name: variable.name,
+                isFinal: variable.isFinal,
+                expr: newVar,
+                type: variable.type
+            }])
+        };
+
+        var newAssign = {
+            pos: Context.currentPos(),
+            expr: EBinop(Binop.OpAssign, newVarName, variable.expr)
+        };
+
+        expressions.push(newExpr);
+        expressions.push(newAssign);
+    }
+
+    static function createNewDVarDeclaration(variable : Var, expressions : Array<Expr>) : Void {
+        var newVarName = {
+            pos: Context.currentPos(),
+            expr: EConst(CIdent(variable.name))
+        }
+
+        var newDVar = {
+            pos: Context.currentPos(),
+            expr: EConst(CFloat('0.0'))
+        }
+
+        var newDExpr = {
+            pos: Context.currentPos(),
+            expr: EVars([{
+                name: 'd'+variable.name,
+                isFinal: variable.isFinal,
+                expr: newDVar,
+                type: variable.type
+            }])
+        };
+
+        expressions.push(newDExpr);
+    }
 }
 #end

@@ -24,29 +24,29 @@ class ForwardTrace {
         index = 0;
         switch(expr.expr) {
             case EBlock(exprs):
-                trace(exprs);
                 for(expression in exprs) {
                     switch(expression.expr) {
                         case EBinop(op, e1, e2):
-                            
-                        case EVars(vars):
-                            var name = vars[0].name;
-                            processExpression(vars[0].expr, newExpressions);
-                            var dt = newExpressions.pop();
-                            var t = newExpressions.pop();
-                            
-                            switch(t.expr) {
-                                case EVars(var_out):
-                                    newExpressions.push(Util.createNewVariable(name, var_out[0].expr));
-                                default:
-                            }
+                            switch(op) {
+                                case OpAssign:
+                                    processExpression(e2, newExpressions);
+                                    var dt = newExpressions.pop();
+                                    var t = newExpressions.pop();
 
-                            switch(dt.expr) {
-                                case EVars(var_out):
-                                    newExpressions.push(Util.createNewVariable('d' + name, var_out[0].expr));
+                                    var tExpr = Util.getVariableExpression(t);
+                                    var dtExpr = Util.getVariableExpression(dt);
+
+                                    var name = Util.getName(e1.expr);
+                                    var newAssign = createAssignment(name, tExpr);
+                                    newExpressions.push(newAssign);
+
+                                    var name = Util.getName(e1.expr);
+                                    var newAssign = createAssignment('d' + name, dtExpr);
+                                    newExpressions.push(newAssign);
                                 default:
                             }
                         case EReturn(e):
+                            
                             var name = "";
                             switch(e.expr) {
                                 case EConst(c):
@@ -130,6 +130,20 @@ class ForwardTrace {
             pos: Context.currentPos(),
             expr: EConst(CIdent(name))
         };
+
+        return newExpr;
+    }
+
+    static function createAssignment(name : String, expr : Expr) : Expr {
+        var name = {
+            pos: Context.currentPos(),
+            expr: EConst(CIdent(name))
+        };
+
+        var newExpr = {
+            pos : Context.currentPos(),
+            expr: EBinop(OpAssign, name, expr)
+        }
 
         return newExpr;
     }

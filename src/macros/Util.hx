@@ -18,6 +18,26 @@ class Util {
         return newVar;
     }
 
-    
+    public static function getName(def : ExprDef) : String {
+        switch(def) {
+            case EConst(c):
+                switch (c) {
+                    case CIdent(s):
+                        return s;
+                    default:
+                }
+            default:
+        }
+        return "";
+    }
+
+    public static function getVariableExpression(expr : Expr) : Expr {
+        switch(expr.expr) {
+            case EVars(var_out):
+                return var_out[0].expr;
+            default:
+        }
+        return null;
+    }
 }
 #end

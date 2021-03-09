@@ -22,7 +22,9 @@ class Test {
 */
  
 public static function func1(x1 : Float, x2 : Float) : Float {
-    return x1*2;
+  var z = 0.0;//x1*x2 + Math.sin(x1);
+    z = 3*x1;
+    return z;
   }
 
 }
