@@ -8,6 +8,13 @@ class Derivitive {
 
     public static function create(def : ExprDef) : Expr {
         switch(def) {
+            case EUnop(op, postFix, e):
+                switch(op) {
+                    case OpNeg:
+                        return handleNegative(e);
+                    default:
+                        return e;
+                }
             case EBinop(op, e1, e2):
                 switch(op) {
                     case OpMult:
