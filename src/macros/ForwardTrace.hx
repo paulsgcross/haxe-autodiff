@@ -7,7 +7,6 @@ import haxe.macro.Context;
 class ForwardTrace {
     static var index = 0;
     public static function performForwardTrace(func : Function) : Function {
-        var newExpressions : Array<Expr> = new Array();
         var expr = func.expr;
         var newArgs = new Array();
         for(arg in func.args) {
@@ -21,11 +20,33 @@ class ForwardTrace {
         }
         func.args = newArgs;
 
+        var block = processExpressionBlock(expr);
+
+        var newFunc : Function = {
+            args: func.args,
+            ret: func.ret,
+            expr: block
+        };
+
+        return newFunc;
+    }
+
+    static function processExpressionBlock(block : Expr) : Expr {
+        var newExpressions : Array<Expr> = new Array();
         index = 0;
-        switch(expr.expr) {
+        switch(block.expr) {
             case EBlock(exprs):
                 for(expression in exprs) {
                     switch(expression.expr) {
+                        case EFor(it, expr):
+                            var newFor = Util.createFor(it, processExpressionBlock(expr));
+                            newExpressions.push(newFor);
+                        case EWhile(econd, expr, normal):
+                            var newFor = Util.createWhile(econd, processExpressionBlock(expr), normal);
+                            newExpressions.push(newFor);
+                        case EIf(econd, eif, eelse):
+                            var newWhile = Util.createIf(econd, processExpressionBlock(eif), eelse==null?null:processExpressionBlock(eelse));
+                            newExpressions.push(newWhile);
                         case EBinop(op, e1, e2):
                             switch(op) {
                                 case OpAssign:
@@ -52,16 +73,12 @@ class ForwardTrace {
             default:
         }
 
-        var newFunc : Function = {
-            args: func.args,
-            ret: func.ret,
-            expr: {
-                pos: Context.currentPos(),
-                expr: EBlock(newExpressions)
-            }
-        };
+        var newBlock = {
+            pos: Context.currentPos(),
+            expr: EBlock(newExpressions)
+        }
 
-        return newFunc;
+        return newBlock;
     }
 
     static function processExpression(expression : Expr, expressions : Array<Expr>) : Expr {

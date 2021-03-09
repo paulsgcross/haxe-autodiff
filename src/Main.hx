@@ -22,8 +22,14 @@ class Test {
 */
  
 public static function func1(x1 : Float) : Float {
-    var s = 1/(1+Math.exp(-x1));
-    return s;
+    var z = 0.0;
+    if(x1 > 0.5) {
+      z = 2*x1;
+    } else {
+      z = 3*x1;
+    }
+    
+    return z;
   }
 
 }

@@ -37,11 +37,10 @@ class AD {
     }
 
     static function processFunction(func : Function) : Function {
-        var newExpressions : Array<Expr> = new Array();
         var expr = func.expr;
         var index = 0;
         
-        var block = processExpressionBlock(expr, newExpressions);
+        var block = processExpressionBlock(expr);
                 
         var newFunc : Function = {
             args: func.args,
@@ -52,7 +51,8 @@ class AD {
         return newFunc;
     }
 
-    static function processExpressionBlock(block : Expr, newExpressions : Array<Expr>) : Expr {
+    static function processExpressionBlock(block : Expr) : Expr {
+        var newExpressions : Array<Expr> = new Array();
         var index = 0;
         switch(block.expr) {
             case EBlock(expressions):
@@ -60,7 +60,14 @@ class AD {
                 var def = expression.expr;
                 switch(def) {
                     case EFor(it, expr):
-                        trace(expr.expr);
+                        var newFor = Util.createFor(it, processExpressionBlock(expr));
+                        newExpressions.push(newFor);
+                    case EWhile(econd, e, normalWhile):
+                        var newWhile = Util.createWhile(econd, processExpressionBlock(e), normalWhile);
+                        newExpressions.push(newWhile);
+                    case EIf(econd, eif, eelse):
+                        var newWhile = Util.createIf(econd, processExpressionBlock(eif), eelse==null?null:processExpressionBlock(eelse));
+                        newExpressions.push(newWhile);
                     case EVars(vars):
                         var variable = vars[0];
                         switch(variable.expr.expr) {

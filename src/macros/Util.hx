@@ -47,5 +47,27 @@ class Util {
         }
         return null;
     }
+    
+    public static function createFor(it : Expr, expr : Expr) : Expr {
+        return {
+            pos: Context.currentPos(),
+            expr: EFor(it, expr)
+        };
+    }
+
+    public static function createWhile(cond : Expr, expr : Expr, normal : Bool) : Expr {
+        return {
+            pos: Context.currentPos(),
+            expr: EWhile(cond, expr, normal)
+        };
+    }
+
+    public static function createIf(cond : Expr, expr : Expr, eelse : Expr) : Expr {
+        return {
+            pos: Context.currentPos(),
+            expr: EIf(cond, expr, eelse)
+        };
+    }
+
 }
 #end
