@@ -33,26 +33,12 @@ class ForwardTrace {
                                     performFinalAssignment(Util.getName(e1.expr), newExpressions);
                                 case OpAssignOp(o2):
                                     processExpression(e2, newExpressions);
-                                    performFinalAssignment(Util.getName(e1.expr), newExpressions);
+                                    performFinalOpAssignment(Util.getName(e1.expr), o2, newExpressions);
                                 default:
                             }
                         case EReturn(e):
-                            
-                            var name = "";
-                            switch(e.expr) {
-                                case EConst(c):
-                                    switch(c) {
-                                        case CIdent(s):
-                                            name = s;
-                                        default:
-                                    }
-                                default:
-                            }
-
-                            var newDvar = {
-                                pos: Context.currentPos(),
-                                expr: EConst(CIdent('d'+name))
-                            };
+                            var name = Util.getName(e.expr);
+                            var newDvar = Util.createVariableReference('d' + name);
 
                             newExpressions.push({
                                 pos: Context.currentPos(), 
@@ -122,6 +108,33 @@ class ForwardTrace {
         expressions.push(newAssign);
     }
 
+    static function performFinalOpAssignment(name : String, op : Binop, expressions : Array<Expr>) : Void {
+        var dt = expressions.pop();
+        var t = expressions.pop();
+
+        var tExpr = Util.getVariableExpression(t);
+        var dtExpr = Util.getVariableExpression(dt);
+
+        var opVar = Util.createVariableReference(name);
+        var opDVar = Util.createVariableReference('d'+name);
+
+        var opExpr = {
+            pos : Context.currentPos(),
+            expr: EBinop(op, opVar, tExpr)
+        }
+
+        var opDExpr = {
+            pos : Context.currentPos(),
+            expr: EBinop(op, opDVar, dtExpr)
+        }
+
+        var newAssign = createAssignment(name, opExpr);
+        expressions.push(newAssign);
+
+        var newAssign = createAssignment('d' + name, opDExpr);
+        expressions.push(newAssign);
+    }
+
     static function createIntermediateVar(def : ExprDef, expressions : Array<Expr>) : Expr {
         var name = 't' + Std.string(index++);
         var newVar = {
@@ -140,10 +153,7 @@ class ForwardTrace {
     }
 
     static function createAssignment(name : String, expr : Expr) : Expr {
-        var name = {
-            pos: Context.currentPos(),
-            expr: EConst(CIdent(name))
-        };
+        var name = Util.createVariableReference(name);
 
         var newExpr = {
             pos : Context.currentPos(),

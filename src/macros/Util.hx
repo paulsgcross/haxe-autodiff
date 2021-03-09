@@ -18,6 +18,14 @@ class Util {
         return newVar;
     }
 
+    public static function createVariableReference(name : String) : Expr {
+        var opVar = {
+            pos: Context.currentPos(),
+            expr: EConst(CIdent(name))
+        };
+        return opVar;
+    }
+
     public static function getName(def : ExprDef) : String {
         switch(def) {
             case EConst(c):
