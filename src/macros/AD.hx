@@ -41,64 +41,73 @@ class AD {
         var newExpressions : Array<Expr> = new Array();
         var expr = func.expr;
         var index = 0;
-        switch(expr.expr) {
-            case EBlock(exprs):
-                for(expression in exprs) {
-                    var def = expression.expr;
-                    switch(def) {
-                        case EVars(vars):
-                            var variable = vars[0];
-                            switch(variable.expr.expr) {
-                                case EConst(c):
-                                    switch(c) {
-                                        case CFloat(f) | CInt(f):
-                                            createNewDVarDeclaration(variable, newExpressions);
-                                            newExpressions.push(expression);
-                                            continue;
-                                        default:
-                                    }
-                                default:
-                            }
-
-                            createNewDVarDeclaration(variable, newExpressions);
-                            createNewVarDeclaration(variable, newExpressions);
-                        case EReturn(expr):
-                            switch (expr.expr) {
-                                case EConst(c):
-                                    newExpressions.push(expression);
-                                default:
-                                    var name = 'ret' + Std.string(index++);
-                                    var newVar : Expr = Util.createNewVariable(name, expr);
-                                    
-                                    var returnExpr = {
-                                        pos: Context.currentPos(),
-                                        expr: EReturn({
-                                            pos: Context.currentPos(),
-                                            expr: EConst(CIdent(name))
-                                        })
-                                    };
-
-                                    newExpressions.push(newVar);
-                                    newExpressions.push(returnExpr);
-                            }
-                            
-                        default:
-                            newExpressions.push(expression);
-                    }
-                }
-            default:
-        }
-
+        
+        var block = processExpressionBlock(expr, newExpressions);
+                
         var newFunc : Function = {
             args: func.args,
             ret: func.ret,
-            expr: {
-                pos: Context.currentPos(),
-                expr: EBlock(newExpressions)
-            }
+            expr: block
         };
 
         return newFunc;
+    }
+
+    static function processExpressionBlock(block : Expr, newExpressions : Array<Expr>) : Expr {
+        var index = 0;
+        switch(block.expr) {
+            case EBlock(expressions):
+            for(expression in expressions) {
+                var def = expression.expr;
+                switch(def) {
+                    case EFor(it, expr):
+                        trace(expr.expr);
+                    case EVars(vars):
+                        var variable = vars[0];
+                        switch(variable.expr.expr) {
+                            case EConst(c):
+                                switch(c) {
+                                    case CFloat(f) | CInt(f):
+                                        createNewDVarDeclaration(variable, newExpressions);
+                                        newExpressions.push(expression);
+                                        continue;
+                                    default:
+                                }
+                            default:
+                        }
+
+                        createNewDVarDeclaration(variable, newExpressions);
+                        createNewVarDeclaration(variable, newExpressions);
+                    case EReturn(expr):
+                        switch (expr.expr) {
+                            case EConst(c):
+                                newExpressions.push(expression);
+                            default:
+                                var name = 'ret' + Std.string(index++);
+                                var newVar : Expr = Util.createNewVariable(name, expr);
+                                
+                                var returnExpr = {
+                                    pos: Context.currentPos(),
+                                    expr: EReturn(Util.createVariableReference(name))
+                                };
+
+                                newExpressions.push(newVar);
+                                newExpressions.push(returnExpr);
+                        }
+                        
+                    default:
+                        newExpressions.push(expression);
+                }
+            }
+            default:
+        }
+
+        var newBlock = {
+            pos: Context.currentPos(),
+            expr: EBlock(newExpressions)
+        }
+
+        return newBlock;
     }
 
     static function createNewVarDeclaration(variable : Var, expressions : Array<Expr>) : Void {

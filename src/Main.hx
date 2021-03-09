@@ -22,8 +22,9 @@ class Test {
 */
  
 public static function func1(x1 : Float) : Float {
+    var w = 4.0;
     var z = 0.0;
-    z = x1*x1;
+    z = w*x1 + 5;
     return z;
   }
 
