@@ -82,38 +82,36 @@ class AD {
 
                         createNewDVarDeclaration(variable, newExpressions);
                         createNewVarDeclaration(variable, newExpressions);
+                    case ECall(e1, params):
+                        switch(e1.expr) {
+                            case EField(e2, field):
+                                switch(field) {
+                                    case 'push':
+                                        var index = 0;
+                                        var newParams = new Array();
+                                        for(param in params) {
+                                            var newParam = handleInnerExpression('out' + Std.string(index++), param, newExpressions);
+                                            newParams.push(newParam);
+                                        }
+                                        var returnExpr = {
+                                            pos: Context.currentPos(),
+                                            expr: ECall(e1, newParams)
+                                        };
+                                        newExpressions.push(returnExpr);
+                                    default:
+                                }
+                            default:
+                        }
                     case EReturn(expr):
                         switch (expr.expr) {
                             case EConst(c):
                                 newExpressions.push(expression);
                             default:
                                 var name = 'ret';
-                                var dname = 'd' + name;
-                                var ref = Util.createVariableReference(name);
-
-                                var newVar : Expr = Util.createNewVariable(name, {
-                                    pos: Context.currentPos(),
-                                    expr: EConst(CFloat('0.0'))
-                                });
-                                
-                                var newDVar : Expr = Util.createNewVariable(dname, {
-                                    pos: Context.currentPos(),
-                                    expr: EConst(CFloat('0.0'))
-                                });
-                                
-                                var newAssign = {
-                                    pos: Context.currentPos(),
-                                    expr: EBinop(Binop.OpAssign, ref, expr)
-                                };
-
                                 var returnExpr = {
                                     pos: Context.currentPos(),
-                                    expr: EReturn(ref)
+                                    expr: EReturn(handleInnerExpression(name, expr, newExpressions))
                                 };
-
-                                newExpressions.push(newVar);
-                                newExpressions.push(newDVar);
-                                newExpressions.push(newAssign);
                                 newExpressions.push(returnExpr);
                         }
                         
@@ -130,6 +128,32 @@ class AD {
         }
 
         return newBlock;
+    }
+
+    static function handleInnerExpression(name : String, expr : Expr, expressions : Array<Expr>) : Expr {
+        var dname = 'd' + name;
+        var ref = Util.createVariableReference(name);
+
+        var newVar : Expr = Util.createNewVariable(name, {
+            pos: Context.currentPos(),
+            expr: EConst(CFloat('0.0'))
+        });
+        
+        var newDVar : Expr = Util.createNewVariable(dname, {
+            pos: Context.currentPos(),
+            expr: EConst(CFloat('0.0'))
+        });
+        
+        var newAssign = {
+            pos: Context.currentPos(),
+            expr: EBinop(Binop.OpAssign, ref, expr)
+        };
+
+        expressions.push(newVar);
+        expressions.push(newDVar);
+        expressions.push(newAssign);
+
+        return ref;
     }
 
     static function createNewVarDeclaration(variable : Var, expressions : Array<Expr>) : Void {

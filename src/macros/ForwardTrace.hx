@@ -10,7 +10,15 @@ class ForwardTrace {
         var expr = func.expr;
         var newArgs = new Array();
         for(arg in func.args) {
+            if(!checkType(arg)) {
+                throw 'Function argument types must be Float or Array<Float>.';
+            }
+
             newArgs.push(arg);
+
+            if(checkArray(arg))
+                continue;
+
             newArgs.push({
                 name: 'd' + arg.name,
                 opt: arg.opt,
@@ -18,6 +26,7 @@ class ForwardTrace {
                 type: arg.type
             });
         }
+
         func.args = newArgs;
 
         var block = processExpressionBlock(expr);
@@ -31,6 +40,24 @@ class ForwardTrace {
         return newFunc;
     }
 
+    static function checkType(arg : FunctionArg) : Bool {
+        switch(arg.type) {
+            case TPath(p):
+                return p.name == 'Float' || p.name == 'Array';
+            default:
+        }
+        return false;
+    }
+
+    static function checkArray(arg : FunctionArg) : Bool {
+        switch(arg.type) {
+            case TPath(p):
+                return p.name == 'Array';
+            default:
+        }
+        return false;
+    }
+
     static function processExpressionBlock(block : Expr) : Expr {
         var newExpressions : Array<Expr> = new Array();
         index = 0;
@@ -39,7 +66,7 @@ class ForwardTrace {
                 for(expression in exprs) {
                     switch(expression.expr) {
                         case EFor(it, expr):
-                            newExpressions.push(createForTempVariable(it));
+                            newExpressions.push(Util.createForTempVariable(it));
                             var newFor = Util.createFor(it, processExpressionBlock(expr));
                             newExpressions.push(newFor);
                         case EWhile(econd, expr, normal):
@@ -58,6 +85,16 @@ class ForwardTrace {
                                     performFinalOpAssignment(Util.getName(e1.expr), o2, newExpressions);
                                 default:
                             }
+                            case ECall(e1, params):
+                                switch(e1.expr) {
+                                    case EField(e2, field):
+                                        switch(field) {
+                                            case 'push':
+                                                // TODO: finish this.
+                                            default:
+                                        }
+                                    default:
+                                }
                         case EReturn(e):
                             var name = Util.getName(e.expr);
                             var newDvar = Util.createVariableReference('d' + name);
@@ -121,10 +158,10 @@ class ForwardTrace {
         var tExpr = Util.getVariableExpression(t);
         var dtExpr = Util.getVariableExpression(dt);
 
-        var newAssign = createAssignment(name, tExpr);
+        var newAssign = Util.createAssignment(name, tExpr);
         expressions.push(newAssign);
 
-        var newAssign = createAssignment('d' + name, dtExpr);
+        var newAssign = Util.createAssignment('d' + name, dtExpr);
         expressions.push(newAssign);
     }
 
@@ -148,10 +185,10 @@ class ForwardTrace {
             expr: EBinop(op, opDVar, dtExpr)
         }
 
-        var newAssign = createAssignment(name, opExpr);
+        var newAssign = Util.createAssignment(name, opExpr);
         expressions.push(newAssign);
 
-        var newAssign = createAssignment('d' + name, opDExpr);
+        var newAssign = Util.createAssignment('d' + name, opDExpr);
         expressions.push(newAssign);
     }
 
@@ -170,31 +207,6 @@ class ForwardTrace {
         };
 
         return newExpr;
-    }
-
-    static function createAssignment(name : String, expr : Expr) : Expr {
-        var name = Util.createVariableReference(name);
-
-        var newExpr = {
-            pos : Context.currentPos(),
-            expr: EBinop(OpAssign, name, expr)
-        }
-
-        return newExpr;
-    }
-
-    public static function createForTempVariable(it : Expr) : Expr {
-        switch(it.expr) {
-            case EBinop(op, e1, e2):
-                var name = Util.getName(e1.expr);
-                trace(e2.expr);
-               return  Util.createNewVariable('d'+name, {
-                   pos: Context.currentPos(),
-                   expr: EConst(CInt('0'))
-               });
-            default:
-        }
-        return null;
     }
 
 }

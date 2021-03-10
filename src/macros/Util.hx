@@ -69,5 +69,30 @@ class Util {
         };
     }
 
+    public static function createAssignment(name : String, expr : Expr) : Expr {
+        var name = Util.createVariableReference(name);
+
+        var newExpr = {
+            pos : Context.currentPos(),
+            expr: EBinop(OpAssign, name, expr)
+        }
+
+        return newExpr;
+    }
+
+    public static function createForTempVariable(it : Expr) : Expr {
+        switch(it.expr) {
+            case EBinop(op, e1, e2):
+                var name = Util.getName(e1.expr);
+                trace(e2.expr);
+               return  Util.createNewVariable('d'+name, {
+                   pos: Context.currentPos(),
+                   expr: EConst(CInt('0'))
+               });
+            default:
+        }
+        return null;
+    }
+
 }
 #end
