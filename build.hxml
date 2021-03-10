@@ -1,3 +1,4 @@
 -cp src
+-lib hxcpp-debug-server
 -main Main
 -cpp bin/

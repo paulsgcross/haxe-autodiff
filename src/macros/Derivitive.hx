@@ -8,6 +8,11 @@ class Derivitive {
 
     public static function create(def : ExprDef) : Expr {
         switch(def) {
+            case EConst(c):
+                return {
+                    pos: Context.currentPos(),
+                    expr: makeDeltaDef(def)
+                };
             case EUnop(op, postFix, e):
                 switch(op) {
                     case OpNeg:
@@ -344,8 +349,8 @@ class Derivitive {
         return newExpr;
     }
 
-    static function makeDeltaExpression(expr : Expr) : Expr {
-        var out_def = expr.expr;
+    static function makeDeltaDef(def : ExprDef) : ExprDef {
+        var out_def = def;
         switch(out_def) {
             case EConst(c):
                 switch(c) {
@@ -359,6 +364,12 @@ class Derivitive {
                 }
             default:
         }
+
+        return out_def;
+    }
+
+    static function makeDeltaExpression(expr : Expr) : Expr {
+        var out_def = makeDeltaDef(expr.expr);
 
         var expr = {
             pos: Context.currentPos(),

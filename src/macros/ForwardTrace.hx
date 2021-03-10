@@ -39,6 +39,7 @@ class ForwardTrace {
                 for(expression in exprs) {
                     switch(expression.expr) {
                         case EFor(it, expr):
+                            trace(it);
                             var newFor = Util.createFor(it, processExpressionBlock(expr));
                             newExpressions.push(newFor);
                         case EWhile(econd, expr, normal):
@@ -83,6 +84,8 @@ class ForwardTrace {
 
     static function processExpression(expression : Expr, expressions : Array<Expr>) : Expr {
         switch(expression.expr) {
+            case EConst(c):
+                return createIntermediateVar(expression.expr, expressions);
             case EBinop(op, e1, e2):
                 
                 var exp1 = processExpression(e1, expressions);
