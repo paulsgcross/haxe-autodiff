@@ -90,14 +90,32 @@ class AD {
                                 newExpressions.push(expression);
                             default:
                                 var name = 'ret' + Std.string(index++);
-                                var newVar : Expr = Util.createNewVariable(name, expr);
+                                var dname = 'd' + name;
+                                var ref = Util.createVariableReference(name);
+
+                                var newVar : Expr = Util.createNewVariable(name, {
+                                    pos: Context.currentPos(),
+                                    expr: EConst(CFloat('0.0'))
+                                });
                                 
+                                var newDVar : Expr = Util.createNewVariable(dname, {
+                                    pos: Context.currentPos(),
+                                    expr: EConst(CFloat('0.0'))
+                                });
+                                
+                                var newAssign = {
+                                    pos: Context.currentPos(),
+                                    expr: EBinop(Binop.OpAssign, ref, expr)
+                                };
+
                                 var returnExpr = {
                                     pos: Context.currentPos(),
-                                    expr: EReturn(Util.createVariableReference(name))
+                                    expr: EReturn(ref)
                                 };
 
                                 newExpressions.push(newVar);
+                                newExpressions.push(newDVar);
+                                newExpressions.push(newAssign);
                                 newExpressions.push(returnExpr);
                         }
                         
