@@ -13,8 +13,11 @@ class Main {
 class Test {
   
   public static function func1(x : Float) : Float {
-    var z = Math.pow(x, 2);
-    return z;
+    if(x > 0.0) {
+      return Math.pow(x, 3);
+    } else {
+      return Math.pow(x, 2);
+    }
   }
   
 }

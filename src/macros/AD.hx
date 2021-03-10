@@ -38,7 +38,6 @@ class AD {
 
     static function processFunction(func : Function) : Function {
         var expr = func.expr;
-        var index = 0;
         
         var block = processExpressionBlock(expr);
                 
@@ -53,7 +52,6 @@ class AD {
 
     static function processExpressionBlock(block : Expr) : Expr {
         var newExpressions : Array<Expr> = new Array();
-        var index = 0;
         switch(block.expr) {
             case EBlock(expressions):
             for(expression in expressions) {
@@ -89,7 +87,7 @@ class AD {
                             case EConst(c):
                                 newExpressions.push(expression);
                             default:
-                                var name = 'ret' + Std.string(index++);
+                                var name = 'ret';
                                 var dname = 'd' + name;
                                 var ref = Util.createVariableReference(name);
 
