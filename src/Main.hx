@@ -16,9 +16,11 @@ class Main {
 class Test {
   
   public static function func1(x1 : Float, x2 : Float) : Float {
-    var w = 5.0;
-    return w;
+    var z = 0.0;
+    for(i in 0...1000) {
+      z += Math.sin(x1*i);
+    }
+    return z;
   }
   
-
 }

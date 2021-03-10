@@ -39,7 +39,7 @@ class ForwardTrace {
                 for(expression in exprs) {
                     switch(expression.expr) {
                         case EFor(it, expr):
-                            trace(it);
+                            newExpressions.push(createForTempVariable(it));
                             var newFor = Util.createFor(it, processExpressionBlock(expr));
                             newExpressions.push(newFor);
                         case EWhile(econd, expr, normal):
@@ -181,6 +181,20 @@ class ForwardTrace {
         }
 
         return newExpr;
+    }
+
+    public static function createForTempVariable(it : Expr) : Expr {
+        switch(it.expr) {
+            case EBinop(op, e1, e2):
+                var name = Util.getName(e1.expr);
+                trace(e2.expr);
+               return  Util.createNewVariable('d'+name, {
+                   pos: Context.currentPos(),
+                   expr: EConst(CInt('0'))
+               });
+            default:
+        }
+        return null;
     }
 
 }
