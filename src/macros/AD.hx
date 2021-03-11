@@ -87,10 +87,9 @@ class AD {
                             case EField(e2, field):
                                 switch(field) {
                                     case 'push':
-                                        var index = 0;
                                         var newParams = new Array();
                                         for(param in params) {
-                                            var newParam = handleInnerExpression('out' + Std.string(index++), param, newExpressions);
+                                            var newParam = handleInnerExpression('out', param, newExpressions);
                                             newParams.push(newParam);
                                         }
                                         var returnExpr = {

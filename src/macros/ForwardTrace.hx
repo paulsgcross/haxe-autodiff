@@ -90,7 +90,16 @@ class ForwardTrace {
                                     case EField(e2, field):
                                         switch(field) {
                                             case 'push':
-                                                // TODO: finish this.
+                                                var newParams = new Array();
+                                                for(param in params) {
+                                                    var name = Util.getName(param.expr);
+                                                    var newDvar = Util.createVariableReference('d' + name);
+                                                    newParams.push(newDvar);
+                                                }
+                                                newExpressions.push({
+                                                    pos: Context.currentPos(), 
+                                                    expr: ECall(e1, newParams)
+                                                });
                                             default:
                                         }
                                     default:
@@ -193,7 +202,7 @@ class ForwardTrace {
     }
 
     static function createIntermediateVar(def : ExprDef, expressions : Array<Expr>) : Expr {
-        var name = 't' + Std.string(index++);
+        var name = '_ad' + Std.string(index++);
         var newVar = {
             pos: Context.currentPos(),
             expr: def

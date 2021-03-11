@@ -3,8 +3,13 @@ import haxe.macro.Expr.ImportMode;
 
 class Main {
   static function main() {
+
     var out = new Array();
-    Test.funcMult_diff(2.0, 1.0, out);
+    Test.funcMult(3.0, out);
+    trace(out);
+
+    var out = new Array();
+    Test.funcMult_diff(3.0, 1.0, out);
     trace(out);
   }
 
@@ -22,8 +27,9 @@ class Test {
   }
 */
   public static function funcMult(x : Float, result : Array<Float>) : Void {
-      result.push(Math.pow(x, 1));
-      result.push(Math.pow(x, 2));
-      result.push(Math.pow(x, 3));
+    var z = x + 1;
+      result.push(Math.pow(z, 2));
+      result.push(z);
+      result.push(z*3);
   }
 }
