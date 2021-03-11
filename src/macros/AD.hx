@@ -10,7 +10,7 @@ class AD {
     }
     
     macro static public function buildBackward() : Array<Field> {
-        return build(ForwardTrace.performForwardTrace);
+        return build(BackwardTrace.performBackwardTrace);
     }
 
     static function build(method : Function -> Function) : Array<Field> {

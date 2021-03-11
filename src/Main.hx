@@ -1,21 +1,25 @@
-import cpp.VirtualArray.NativeVirtualArray;
-import haxe.macro.Expr.ImportMode;
+
+import haxe.macro.Expr;
+import haxe.macro.Context;
 
 class Main {
   static function main() {
 
-    var out = new Array();
-    Test.funcMult(3.0, out);
+    var out = Test.funcMult(3.0);
     trace(out);
 
-    var out = new Array();
-    Test.funcMult_diff(3.0, 1.0, out);
-    trace(out);
+    //var out = Test.funcMult_diff(3.0, 1.0);
+    //trace(out);
+  }
+
+  public static macro function diff(expr : Expr) : Expr {
+    trace(expr);
+    return expr;
   }
 
 }
 
-@:build(macros.AD.buildForward())
+//@:build(macros.AD.buildForward())
 class Test {
   /*
   public static function func1(x : Float) : Float {
@@ -26,10 +30,11 @@ class Test {
     }
   }
 */
-  public static function funcMult(x : Float, result : Array<Float>) : Void {
-    var z = x + 1;
-      result.push(Math.pow(z, 2));
-      result.push(z);
-      result.push(z*3);
+  public static function funcMult(x : Float) : Float {
+    var z = 0.0;
+    for(i in 0...10) {
+      z += Math.cos(Math.pow(x, i));
+    }
+    return z;
   }
 }
