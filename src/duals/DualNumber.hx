@@ -33,15 +33,15 @@ abstract DualNumber(Vector<Float>) {
         return new DualNumber(v + dual.v, d + dual.d);
     }
 
-    private function get_v() : Float {
+    private inline function get_v() : Float {
         return this[0];
     }
 
-    private function get_d() : Float {
+    private inline function get_d() : Float {
         return this[1];
     }
 
-    public function toString() : String {
+    public inline function toString() : String {
         return v + " + " + d + "e";
     }
 }

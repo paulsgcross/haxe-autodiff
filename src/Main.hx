@@ -6,16 +6,16 @@ import haxe.macro.Context;
 class Main {
   static function main() {
 
-    var out1 = Test.funcMult(Math.PI/4);
-    var out2 = Test.funcMult_diff(Math.PI/4, 1.0);
-    trace(out1);
-    trace(out2);
+    //var out1 = Test.funcMult(Math.PI/4);
+    //var out2 = Test.funcMult_diff(Math.PI/4, 1.0);
+   // trace(out1);
+   // trace(out2);
 
     var dual1 = new DualNumber(3.0, 1.0);
     var dual2 = new DualNumber(3.0, 1.0);
     var dual3 = new DualNumber(3.0, 1.0);
     
-    trace(dual1 + dual2 + dual3);
+    trace((dual1 / dual2));
   }
 
 }
