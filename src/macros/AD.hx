@@ -9,16 +9,19 @@ class AD {
         return build(ForwardTrace.performForwardTrace);
     }
     
-    macro static public function buildBackward() : Array<Field> {
-        return build(BackwardTrace.performBackwardTrace);
-    }
-
     static function build(method : Function -> Function) : Array<Field> {
         var fields = Context.getBuildFields();
         var newFields : Array<Field> = new Array();
 
         for(field in fields) {
             newFields.push(field);
+
+            if(field.meta[0] == null)
+                continue;
+            
+            if(field.meta[0].name != ':diff')
+                continue;
+
             switch(field.kind) {
                 case FieldType.FFun(fn):
                     var newFn = processFunction(fn);
