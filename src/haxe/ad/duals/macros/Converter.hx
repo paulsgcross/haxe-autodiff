@@ -13,12 +13,18 @@ final class Converter {
 
         var fields = Context.getBuildFields();
         for(field in fields) {
+            var meta = field.meta==null?null:field.meta[0];
+            if(meta == null)
+                continue;
+            if(meta.name != ':makeDual')
+                continue;
+
             switch(field.kind) {
                 case FFun(f):
                     trace('Converting... \n'); 
 
                     convertArgs(f.args);
-                    f.expr = propagateFunction(f.expr);
+                    propagateFunction(f.expr);
                     convertReturn(f.ret);
                 default:
             }
@@ -26,19 +32,17 @@ final class Converter {
         return fields;
     }
 
-    private static function propagateFunction(expr : Expr) : Expr {
-        var def = expr.expr;
+    private static function propagateFunction(in_expr : Expr) : Void {
+        var def = in_expr.expr;
         switch(def) {
             case EBlock(exprs):
-                var newExprs = [];
                 for(expr in exprs) {
-                    newExprs.push(propagateFunction(expr));
+                    propagateFunction(expr);
                 }
             case EBinop(_, e1, e2):
-                var e1 = propagateFunction(e1);
-                var e2 = propagateFunction(e2);
+                propagateFunction(e1);
+                propagateFunction(e2);
             case EVars(vars):
-                var newVars = [];
                 for(variable in vars) {
                     propagateFunction(variable.expr);
                 }
@@ -52,9 +56,8 @@ final class Converter {
             case EField(expr, field):
                 propagateFunction(expr);
             case EConst(c):
-                convertConstant(c);
+                in_expr.expr = convertConstant(c);
             default:
-                return expr;
         }
     }
 
@@ -62,40 +65,47 @@ final class Converter {
         for(arg in args) {
             switch(arg.type) {
                 case TPath(p):
-                    if(p.name == 'Float')
-                        trace('Do conversion.'); 
-                    if(p.name == 'Array')
-                        trace('Do conversion.'); 
+                    switch(p.name) {
+                        case 'Array', 'Vector':
+                            switch(p.params[0]) {
+                                case TPType(t):
+                                    switch(t) {
+                                        case TPath(s):
+                                            s.name = 'DualNumber';
+                                            s.pack = ['haxe', 'ad', 'duals'];
+                                        default:
+                                    }
+                                default:
+                            }
+                        case 'Float':
+                            p.name = 'DualNumber';
+                            p.pack = ['haxe', 'ad', 'duals'];
+                    }
                 default:
             }
         }
     }
 
     private static function convertReturn(args : Null<ComplexType>) : Void {
-
-    }
-
-    private static function convertCall(c : ExprDef) : Void {
-    //    trace(c);
-    }
-
-    private static function convertConstant(c : Constant) : Expr {
-        switch(c) {
-            case CIdent(_ => 'Math'):
-                return {
-                    expr: EConst(CIdent('DualMath')),
-                    pos: Context.currentPos()
+        switch(args) {
+            case TPath(p):
+                switch(p.name) {
+                    case 'Float':
+                        p.name = 'DualNumber';
+                        p.pack = ['haxe', 'ad', 'duals'];
+                        
                 }
             default:
-                return {
-                    expr: EConst(c),
-                    pos: Context.currentPos()
-                }
         }
     }
 
-    private static function makeDual() : Void {
-        
+    private static function convertConstant(c : Constant) : ExprDef {
+        switch(c) {
+            case CIdent(_ => 'Math'):
+                return EConst(CIdent('DualMath'));
+            default:
+                return EConst(c);
+        }
     }
 }
 #end
