@@ -1,12 +1,16 @@
 package haxe.ad.duals;
 
-abstract DualNumber(Components) {
+import haxe.ds.Vector;
+
+abstract DualNumber(Vector<Float>) {
 
     public var v(get, never) : Float;
     public var d(get, never) : Float;
 
     public inline function new(v : Float, d : Float) {
-        this = {v: v, d: d};
+        this = VectorStack.get();
+        this[0] = v;
+        this[1] = d;
     }
 
     @:commutative
@@ -68,11 +72,11 @@ abstract DualNumber(Components) {
     }
 
     private inline function get_v() : Float {
-        return this.v;
+        return this[0];
     }
 
     private inline function get_d() : Float {
-        return this.d;
+        return this[1];
     }
 
     public inline function toString() : String {

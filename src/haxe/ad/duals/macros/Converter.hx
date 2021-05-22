@@ -1,5 +1,6 @@
 package haxe.ad.duals.macros;
 
+import haxe.macro.Expr.Var;
 #if macro
 import haxe.macro.Expr.ComplexType;
 import haxe.macro.Expr.FunctionArg;
@@ -44,6 +45,7 @@ final class Converter {
                 propagateFunction(e2);
             case EVars(vars):
                 for(variable in vars) {
+                    trace(variable);
                     propagateFunction(variable.expr);
                 }
             case EWhile(_, expr, _), EFor(_, expr), EReturn(expr):
@@ -107,5 +109,16 @@ final class Converter {
                 return EConst(c);
         }
     }
+    /*
+    private static function convertVar(variable : Var) : Var {
+        var type = variable.type;
+        switch(type) {
+            case TPath(p):
+                switch(p.name) {
+                    case 
+                }
+        }
+    }
+    */
 }
 #end

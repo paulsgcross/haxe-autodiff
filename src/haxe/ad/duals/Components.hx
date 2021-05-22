@@ -1,6 +1,5 @@
 package haxe.ad.duals;
 
-typedef Components = {
-    var v : Float;
-    var d : Float;
+enum Components {
+    DATA(v : Float, d : Float);
 }
