@@ -1,23 +1,25 @@
 
+import duals.DualMath;
 import duals.DualNumber;
-import haxe.macro.Expr;
-import haxe.macro.Context;
 
 class Main {
   static function main() {
-
-    //var out1 = Test.funcMult(Math.PI/4);
-    //var out2 = Test.funcMult_diff(Math.PI/4, 1.0);
-   // trace(out1);
-   // trace(out2);
-
-    var dual1 = new DualNumber(3.0, 1.0);
-    var dual2 = new DualNumber(3.0, 1.0);
-    var dual3 = new DualNumber(3.0, 1.0);
     
-    trace((dual1 / dual2));
+    var v = Math.PI/4;
+    var dual1 = new DualNumber(v, 1.0);
+    
+    quickAssert(DualMath.pow(dual1, 2).d ==  3*v);
+    quickAssert(DualMath.sin(dual1).d == Math.cos(v));
+    quickAssert(DualMath.cos(dual1).d == -Math.sin(v));
+    quickAssert(DualMath.tan(dual1).d == 1 + (Math.tan(v)*Math.tan(v)));
   }
 
+  private static function quickAssert(check : Bool) : Void {
+    if(!check)
+      trace('Assert failed.');
+    else
+      trace('Assert passed.');
+  }
 }
 
 @:build(macros.AD.buildForward())

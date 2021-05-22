@@ -1,16 +1,12 @@
 package duals;
 
-import haxe.ds.Vector;
-
-abstract DualNumber(Vector<Float>) {
+abstract DualNumber(Components) {
 
     public var v(get, never) : Float;
     public var d(get, never) : Float;
 
     public inline function new(v : Float, d : Float) {
-        this = new Vector(2);
-        this[0] = v;
-        this[1] = d;
+        this = {v: v, d: d};
     }
 
     @:op(A*B)
@@ -34,14 +30,19 @@ abstract DualNumber(Vector<Float>) {
     }
 
     private inline function get_v() : Float {
-        return this[0];
+        return this.v;
     }
 
     private inline function get_d() : Float {
-        return this[1];
+        return this.d;
     }
 
     public inline function toString() : String {
         return v + " + " + d + "e";
     }
+}
+
+private typedef Components = {
+    var v : Float;
+    var d : Float;
 }
