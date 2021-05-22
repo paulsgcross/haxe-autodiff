@@ -1,4 +1,4 @@
-package macros;
+package haxe.ad.macros;
 
 #if macro
 import haxe.macro.Expr;

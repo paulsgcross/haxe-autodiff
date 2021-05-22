@@ -1,4 +1,4 @@
-package duals;
+package haxe.ad.duals;
 
 abstract DualNumber(Components) {
 

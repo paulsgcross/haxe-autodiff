@@ -1,4 +1,4 @@
-package duals;
+package haxe.ad.duals;
 
 class DualMath {
     public static inline function sin(dual : DualNumber) : DualNumber {
