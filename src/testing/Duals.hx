@@ -5,7 +5,14 @@ import haxe.ad.duals.DualNumber;
 
 class Duals {
   static function main() {
-    
+    testMacros();
+  }
+
+  private static function testMacros() {
+    SomeFunctions.test1(3);
+  }
+
+  private static function testDuals() {
     var v = Math.PI/4;
     var dual1 = new DualNumber(v, 1.0);
     
@@ -21,6 +28,8 @@ class Duals {
     quickAssertEquals(DualMath.exp(dual1).d, Math.exp(v));
     quickAssertEquals(DualMath.log(dual1).d, 1/v);
     quickAssertEquals(DualMath.abs(dual1).d, v/Math.abs(v));
+
+    quickAssertEquals((DualMath.cos(dual1) * DualMath.sin(dual1)).d, Math.cos(2*v));
   }
 
   private static var index : Int = 0;
@@ -34,4 +43,19 @@ class Duals {
 
     index++;
   }
+}
+
+@:build(haxe.ad.duals.macros.Converter.build())
+private class SomeFunctions {
+  @:makeDual public static function test1(x : Float) : Float {
+    var f = 3.0*x*x;
+    var g = 2.0*x;
+    var c = Math.cos(Math.cos(2.0));
+
+    return f + g + c;
+  }
+
+  //public static function test2(x : Float, out : Array<Float>) : Void {
+  //  out[0] = 3*x*x + 2*x + 2;
+  //}
 }

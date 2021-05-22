@@ -1,12 +1,12 @@
 package testing;
 
-class Macros {
+class Compiler {
     static function main() {
         
     }
 }
 
-@:build(haxe.ad.macros.AD.buildForward())
+@:build(haxe.ad.compiler.AD.buildForward())
 class Test {
   
   @:diff public static function funcMult(x : Float) : Float {
