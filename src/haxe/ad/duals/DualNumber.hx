@@ -27,8 +27,13 @@ abstract DualNumber(Components) {
     }
 
     @:op(A-B)
-    public inline function subFloat(value : Float) : DualNumber {
-        return new DualNumber(v - value, d);
+    public static inline function subFloatFromDual(left : Float, right : DualNumber) : DualNumber {
+        return new DualNumber(left - right.v, -right.d);
+    }
+
+    @:op(B-A)
+    public static inline function subDualFromFloat(left : DualNumber, right : Float) : DualNumber {
+        return new DualNumber(left.v - right, left.d);
     }
 
     @:commutative
@@ -44,13 +49,18 @@ abstract DualNumber(Components) {
     }
 
     @:op(A/B)
-    public inline function divideDualByDual(dual : DualNumber) : DualNumber {
+    public inline function divideDual(dual : DualNumber) : DualNumber {
         return new DualNumber(v / dual.v, ((d * dual.v) - (v * dual.d)) / (dual.v * dual.v));
     }
 
     @:op(A/B)
-    public inline function divideDualByFloat(value : Float) : DualNumber {
-        return new DualNumber(v / value, (d * value));
+    public static inline function divideDualByFloat(left : DualNumber, right : Float) : DualNumber {
+        return new DualNumber(left.v / right, (left.d * right));
+    }
+
+    @:op(B/A)
+    public static inline function divideFloatByDual(left : Float, right : DualNumber) : DualNumber {
+        return new DualNumber(left / right.v,  -(left * right.d) / (right.v * right.v));
     }
 
     public static inline function fromFloat(value : Float) : DualNumber {
@@ -68,9 +78,4 @@ abstract DualNumber(Components) {
     public inline function toString() : String {
         return v + " + " + d + "e";
     }
-}
-
-private typedef Components = {
-    var v : Float;
-    var d : Float;
 }
