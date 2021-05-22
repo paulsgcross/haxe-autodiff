@@ -1,5 +1,6 @@
 package testing;
 
+import haxe.ds.Vector;
 import haxe.ad.duals.DualMath;
 import haxe.ad.duals.DualNumber;
 
@@ -9,9 +10,17 @@ class Duals {
   }
 
   private static function testMacros() {
-    var v = 4.0;
-    var dual1 = new DualNumber(v, 1.0);
-    trace(DualNumber.fromFloat(4.0) / dual1);
+    var test = new DualNumber(2.0, 1.0);
+    //trace(SomeFunctions.test1(new DualNumber(3.0, 1.0)));
+    //trace(SomeFunctions.test1_dual(new DualNumber(3.0, 1.0)));
+
+    var out = new Vector<DualNumber>(2);
+    SomeFunctions.test2(test, out);
+
+    trace(4.0 - test);
+    trace(test - 4.0);
+    trace(test/4.0);
+    trace(4.0/test);
   }
 
   private static function testDuals() {
@@ -47,24 +56,19 @@ class Duals {
   }
 }
 
-//@:build(haxe.ad.duals.macros.Converter.build())
+@:build(haxe.ad.duals.macros.Converter.build())
 private class SomeFunctions {
-  public static function test1(x : Float) : Float {
-    var f = 3.0*x*x;
-    var g = 2.0*x;
-    var c = Math.cos(Math.cos(2.0));
-
-    return f + g + c;
+  @:makeDual public static function test1(x : Float) : Float {
+    var t  = 3*x;
+    return Math.cos(t);
   }
 
   public static function test1_dual(x : DualNumber) : DualNumber {
-    var f = 3.0*x*x;
-    var g = 2.0*x;
-    var c = Math.cos(Math.cos(2.0));
-
-    return f + g + c;
+    return DualMath.cos(x*x);
   }
-  //public static function test2(x : Float, out : Array<Float>) : Void {
-  //  out[0] = 3*x*x + 2*x + 2;
-  //}
+
+  @:makeDual public static function test2(x : Float, out : Vector<Float>) : Void {
+    out[0] = 3*x*x;
+    out[1] = 2*x + 2;
+  }
 }
