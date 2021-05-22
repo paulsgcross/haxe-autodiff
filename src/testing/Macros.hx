@@ -6,7 +6,7 @@ class Macros {
     }
 }
 
-@:build(macros.AD.buildForward())
+@:build(haxe.ad.macros.AD.buildForward())
 class Test {
   
   @:diff public static function funcMult(x : Float) : Float {
