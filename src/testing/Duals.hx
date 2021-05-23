@@ -10,10 +10,10 @@ class Duals {
   }
 
   private static function testMacros() {
-    var x = new DualNumber(3.0, 0.0);
-    var y = new DualNumber(4.0, 1.0);
+    var x = new DualNumber(-2.0, 1.0);
+    var y = new DualNumber(-2.0, 0.0);
+    var out = new DualNumber(0.0, 0.0);
 
-    var out = new Vector<DualNumber>(4);
     SomeFunctions.test1_dual(x, y, out);
 
     trace(out);
@@ -52,26 +52,12 @@ class Duals {
   }
 }
 
-@:build(haxe.ad.duals.macros.Converter.build())
 private class SomeFunctions {
-  @:makeDual public static function test1(x : Float) : Float {
-    var t = 3*x;
-    return Math.cos(t);
-  }
-
-  public static function test1_dual(x : DualNumber, y : DualNumber, out : Vector<DualNumber>) : Void {
-    var f = x*y;
-    var g = 2.0;
-    var l = f*g + g;
+  public static function test1_dual(x : DualNumber, y : DualNumber, into : DualNumber) : Void {
+    var f = x*x;
+    var g = x*y;
+    var c = y*y;
     
-    out[0] = f;
-    out[1] = l;
-    out[2] = l;
-    out[3] = f;
-  }
-
-  @:makeDual public static function test2(x : Float, out : Vector<Float>) : Void {
-    out[0] = 3*x*x;
-    out[1] = 2*x + 2;
+    into.setToDual(f);
   }
 }
