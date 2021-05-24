@@ -12,8 +12,8 @@ class Derivatives {
                 return transformExpr(e);
             case EBinop(op, e1, e2):
                 return transformBinop(op, e1, e2);
-            case EField(e, field):
-                return transformField(expr, field);
+            case ECall(e, params):
+                return transformCall(e, params);
             case EUnop(op, postfix, e):
                 return transformUnop(op, postfix, e);
             case EConst(c):
@@ -35,22 +35,35 @@ class Derivatives {
         return Expressions.createConstant(c);
     }
     
-    private static function transformField(expr : Expr,  field : String) : Expr {
-        switch(field) {
-            case 'sin':
-            case 'cos':
-            case 'tan':
-            case 'sqrt':
-            case 'abs':
-            case 'exp':
-            case 'pow':
+    private static function transformCall(expr : Expr,  params : Array<Expr>) : Expr {
+        var def = expr.expr;
+
+        switch(def) {
+            case EField(e, field):
+                switch(field) {
+                    case 'sin':
+                        return FieldDerivatives.differentiateSin(e, params);
+                    case 'cos':
+                        return FieldDerivatives.differentiateCos(e, params);
+                    case 'tan':
+                        return FieldDerivatives.differentiateTan(e, params);
+                    case 'sqrt':
+                        return FieldDerivatives.differentiateSqrt(e, params);
+                    case 'abs':
+                        return FieldDerivatives.differentiateAbs(e, params);
+                    case 'exp':
+                        return FieldDerivatives.differentiateExp(e, params);
+                    case 'pow':
+                        return FieldDerivatives.differentiatePow(e, params);
+                    default: 
+                }
             default:
         }
+        
         return expr;
     }
 
     private static function transformUnop(op : Unop, postfix : Bool, e : Expr) : Expr {
-        trace(e);
         return Expressions.createUnop(op, postfix, transformExpr(e));
     }
 

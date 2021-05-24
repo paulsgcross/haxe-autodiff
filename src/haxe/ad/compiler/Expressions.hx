@@ -48,6 +48,13 @@ class Expressions {
         }
     }
 
+    public static function createCall(e : Expr, params : Array<Expr>) : Expr {
+        return {
+            expr: ExprDef.ECall(e, params),
+            pos: Context.currentPos()
+        }
+    }
+
     public static function createUnop(op : Unop, postfix : Bool, e : Expr) : Expr {
         return {
             expr: ExprDef.EUnop(op, postfix, e),
