@@ -22,7 +22,7 @@ class Test {
   }
 
   @:diff public static function funcTrig(x : Float, y : Float) : Float {
-    var f = Math.abs(x);
+    var f = Math.exp(x*y);
     
     return f;
   }

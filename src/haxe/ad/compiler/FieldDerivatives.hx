@@ -48,6 +48,8 @@ class FieldDerivatives {
         ];
 
         var call = Expressions.createCall(Expressions.createField(expr, 'pow'), newParams);
+        call = Expressions.createBinop(Binop.OpMult, in_params[1], call);
+        
         return Expressions.createBinop(Binop.OpMult, Derivatives.transformExpr(in_params[0]), call);
     }
 }
