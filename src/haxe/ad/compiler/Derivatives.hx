@@ -8,6 +8,8 @@ class Derivatives {
         var def = expr.expr;
 
         switch(def) {
+            case EParenthesis(e):
+                return transformExpr(e);
             case EBinop(op, e1, e2):
                 return transformBinop(op, e1, e2);
             case EField(e, field):
@@ -40,6 +42,7 @@ class Derivatives {
     }
     
     private static function transformBinop(op : Binop, e1 : Expr, e2 : Expr) : Expr {
+        trace(op);
         switch(op) {
             case OpMult:
                 var transE1 = Expressions.createBinop(OpMult, e1, transformExpr(e2));
@@ -51,9 +54,8 @@ class Derivatives {
                 var transE4 = Expressions.createBinop(OpMult, e2, e2);
                 var transE3 = Expressions.createBinop(OpSub, transE1, transE2);
                 return Expressions.createBinop(OpDiv, transE3, transE4);
-            case OpAdd, OpSub:
-                return Expressions.createBinop(op, transformExpr(e1), transformExpr(e2));
             default:
+                return Expressions.createBinop(op, transformExpr(e1), transformExpr(e2));
         }
 
         return Expressions.createBinop(op, e1, e2);

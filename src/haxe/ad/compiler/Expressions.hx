@@ -2,7 +2,6 @@ package haxe.ad.compiler;
 
 #if macro
 import haxe.macro.Context;
-import haxe.macro.Expr.ExprDef;
 import haxe.macro.Expr;
 
 class Expressions {

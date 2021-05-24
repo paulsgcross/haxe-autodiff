@@ -55,8 +55,18 @@ class ForwardMode {
             case EReturn(expr):
                 return Expressions.createReturn(transform(expr));
             case EIf(econd, eif, eelse):
-                return Expressions.createIf(econd, transform(eif), transform(eelse));
-            case EField(_, _), EBinop(_, _, _), EConst(_), EParenthesis(_):
+                return Expressions.createIf(econd, transform(eif), eelse!=null?transform(eelse):null);
+            case EBinop(op, _, _):
+                switch(op) {
+                    case OpAdd, OpSub, OpDiv, OpMult:
+                        return Derivatives.transformExpr(expr);
+                    default:
+                        var newExprs = [];
+                        newExprs.push(expr);
+                        newExprs.push(Derivatives.transformExpr(expr));
+                        return Expressions.createBlock(newExprs);
+                }
+            case EField(_, _), EConst(_), EParenthesis(_):
                 return Derivatives.transformExpr(expr);
             default:
         }
