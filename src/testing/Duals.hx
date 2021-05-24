@@ -10,11 +10,10 @@ class Duals {
   }
 
   private static function testMacros() {
-    var x = new DualNumber(-2.0, 1.0);
-    var y = new DualNumber(-2.0, 0.0);
+    var x = new DualNumber(1.0, 1.0);
     var out = new DualNumber(0.0, 0.0);
 
-    SomeFunctions.test1_dual(x, y, out);
+    SomeFunctions.test1_dual(x, out);
 
     trace(out);
   }
@@ -53,10 +52,8 @@ class Duals {
 }
 
 private class SomeFunctions {
-  public static function test1_dual(x : DualNumber, y : DualNumber, into : DualNumber) : Void {
-    var f = x*x;
-    var g = x*y;
-    var c = y*y;
+  public static function test1_dual(x : DualNumber, into : DualNumber) : Void {
+    var f = x*DualMath.sin(x);
     
     into.setToDual(f);
   }
