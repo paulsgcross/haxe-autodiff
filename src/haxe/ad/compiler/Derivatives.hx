@@ -2,7 +2,6 @@ package haxe.ad.compiler;
 
 #if macro
 import haxe.macro.Expr;
-import haxe.macro.Context;
 
 class Derivatives {
     public static function transformExpr(expr : Expr) : Expr {
@@ -10,15 +9,28 @@ class Derivatives {
 
         switch(def) {
             case EBinop(op, e1, e2):
+                return transformBinop(op, e1, e2);
             case EField(e, field):
-            case ECall(e, params):
+                return transformField(expr, field);
             case EConst(c):
+                return transformConst(c);
             default:
         }
 
         return expr;
     }
 
+    private static function transformConst(c : Constant) : Expr {
+        switch(c) {
+            case CFloat(f), CInt(f):
+                return Expressions.createConstant(CFloat('0.0'));
+            case CIdent(f):
+                return Expressions.createConstant(CIdent('d'+f));
+            default:
+        }
+        return Expressions.createConstant(c);
+    }
+    
     private static function transformField(expr : Expr,  field : String) : Expr {
         switch(field) {
             case 'pow':
@@ -30,17 +42,21 @@ class Derivatives {
     private static function transformBinop(op : Binop, e1 : Expr, e2 : Expr) : Expr {
         switch(op) {
             case OpMult:
-                return {
-                    expr: EBinop(Binop.OpAdd, e1, e2),
-                    pos: Context.currentPos()
-                }
+                var transE1 = Expressions.createBinop(OpMult, e1, transformExpr(e2));
+                var transE2 = Expressions.createBinop(OpMult, transformExpr(e1), e2);
+                return Expressions.createBinop(OpAdd, transE1, transE2);
+            case OpDiv:
+                var transE1 = Expressions.createBinop(OpMult, e1, transformExpr(e2));
+                var transE2 = Expressions.createBinop(OpMult, transformExpr(e1), e2);
+                var transE4 = Expressions.createBinop(OpMult, e2, e2);
+                var transE3 = Expressions.createBinop(OpSub, transE1, transE2);
+                return Expressions.createBinop(OpDiv, transE3, transE4);
+            case OpAdd, OpSub:
+                return Expressions.createBinop(op, transformExpr(e1), transformExpr(e2));
             default:
         }
 
-        return {
-            expr: EBinop(op, e1, e2),
-            pos: Context.currentPos()
-        }
+        return Expressions.createBinop(op, e1, e2);
     }
 }
 
