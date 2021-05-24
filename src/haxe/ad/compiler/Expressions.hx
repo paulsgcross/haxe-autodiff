@@ -1,7 +1,7 @@
 package haxe.ad.compiler;
 
-import haxe.macro.Context;
 #if macro
+import haxe.macro.Context;
 import haxe.macro.Expr.ExprDef;
 import haxe.macro.Expr;
 
@@ -45,6 +45,27 @@ class Expressions {
     public static function createReturn(expr : Null<Expr>) : Expr {
         return {
             expr: ExprDef.EReturn(expr),
+            pos: Context.currentPos()
+        }
+    }
+
+    public static function createBinop(op : Binop, e1 : Expr, e2 : Expr) : Expr {
+        return {
+            expr: ExprDef.EBinop(op, e1, e2),
+            pos: Context.currentPos()
+        }
+    }
+
+    public static function createField(expr : Expr,  field : String) : Expr {
+        return {
+            expr: ExprDef.EField(expr, field),
+            pos: Context.currentPos()
+        }
+    }
+
+    public static function createConstant(c : Constant) : Expr {
+        return {
+            expr: ExprDef.EConst(c),
             pos: Context.currentPos()
         }
     }
