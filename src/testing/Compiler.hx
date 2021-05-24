@@ -4,6 +4,9 @@ class Compiler {
     static function main() {
         trace(Test.funcMult(2.0, 2.0));
         trace(Test.funcMultDiff(2.0, 1.0, 2.0, 0.0));
+
+        trace(Test.funcTrig(2.0, 2.0));
+        trace(Test.funcTrigDiff(2.0, 1.0, 2.0, 0.0));
     }
 }
 
@@ -11,12 +14,17 @@ class Compiler {
 class Test {
   
   @:diff public static function funcMult(x : Float, y : Float) : Float {
-    var f = -x;
+    var f = -(x*x);
     var g = x*y;
+    var h = y*y;
     
-    f = g*f;
+    return f + g + h;
+  }
+
+  @:diff public static function funcTrig(x : Float, y : Float) : Float {
+    var f = Math.abs(x);
     
-    return 3.0*(f + g);
+    return f;
   }
 
   public static function test(x : Float) : Float {
