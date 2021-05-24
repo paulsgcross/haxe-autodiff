@@ -1,5 +1,5 @@
 --class-path src/
---main testing.Duals
+--main testing.Compiler
 --cpp bin/cpp/
 --dce full
 --debug
