@@ -1,4 +1,7 @@
--cp src
--lib hxcpp-debug-server
--main Main
--cpp bin/
+--class-path src/
+--main testing.Duals
+--cpp bin/cpp/
+--dce full
+--debug
+
+--library hxcpp-debug-server
