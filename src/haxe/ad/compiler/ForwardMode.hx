@@ -39,6 +39,7 @@ class ForwardMode {
             case EVars(vars):
                 var transVars = [];
                 for(v in vars) {
+                    transVars.push(v);
                     transVars.push({
                         name: 'd' + v.name,
                         type: v.type,
