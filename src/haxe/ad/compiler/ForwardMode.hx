@@ -66,7 +66,7 @@ class ForwardMode {
                         newExprs.push(Derivatives.transformExpr(expr));
                         return Expressions.createBlock(newExprs);
                 }
-            case EField(_, _), EConst(_), EParenthesis(_):
+            case EField(_, _), EConst(_), EParenthesis(_), EUnop(_, _, _):
                 return Derivatives.transformExpr(expr);
             default:
         }

@@ -48,6 +48,13 @@ class Expressions {
         }
     }
 
+    public static function createUnop(op : Unop, postfix : Bool, e : Expr) : Expr {
+        return {
+            expr: ExprDef.EUnop(op, postfix, e),
+            pos: Context.currentPos()
+        }
+    }
+
     public static function createBinop(op : Binop, e1 : Expr, e2 : Expr) : Expr {
         return {
             expr: ExprDef.EBinop(op, e1, e2),

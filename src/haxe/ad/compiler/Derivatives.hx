@@ -14,6 +14,8 @@ class Derivatives {
                 return transformBinop(op, e1, e2);
             case EField(e, field):
                 return transformField(expr, field);
+            case EUnop(op, postfix, e):
+                return transformUnop(op, postfix, e);
             case EConst(c):
                 return transformConst(c);
             default:
@@ -35,14 +37,24 @@ class Derivatives {
     
     private static function transformField(expr : Expr,  field : String) : Expr {
         switch(field) {
+            case 'sin':
+            case 'cos':
+            case 'tan':
+            case 'sqrt':
+            case 'abs':
+            case 'exp':
             case 'pow':
             default:
         }
         return expr;
     }
-    
+
+    private static function transformUnop(op : Unop, postfix : Bool, e : Expr) : Expr {
+        trace(e);
+        return Expressions.createUnop(op, postfix, transformExpr(e));
+    }
+
     private static function transformBinop(op : Binop, e1 : Expr, e2 : Expr) : Expr {
-        trace(op);
         switch(op) {
             case OpMult:
                 var transE1 = Expressions.createBinop(OpMult, e1, transformExpr(e2));
