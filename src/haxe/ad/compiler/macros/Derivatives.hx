@@ -83,7 +83,6 @@ class Derivatives {
                 var transE3 = Expressions.createBinop(OpSub, transE1, transE2);
                 return Expressions.createBinop(OpDiv, transE3, transE4);
             default:
-                trace(e1);
                 return Expressions.createBinop(op, transformExpr(e1), transformExpr(e2));
         }
 
