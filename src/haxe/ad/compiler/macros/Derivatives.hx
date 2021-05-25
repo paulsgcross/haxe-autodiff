@@ -19,6 +19,8 @@ class Derivatives {
                 return transformUnop(op, postfix, e);
             case EConst(c):
                 return transformConst(c);
+            case EArray(e1, e2):
+                return transformArray(e1, e2);
             default:
         }
 
@@ -69,17 +71,6 @@ class Derivatives {
     }
 
     private static function transformBinop(op : Binop, e1 : Expr, e2 : Expr) : Expr {
-        /*
-        switch[AutoDiff.checkParameter(e1), AutoDiff.checkParameter(e2)] {
-            case [true, true]:
-                return Expressions.createBinop(op, e1, e2);
-            case [true, false]:
-                return Expressions.createBinop(op, e1, e2);
-            case [false, true]:
-                return Expressions.createBinop(op, e1, e2);
-            default:
-        }
-*/
         switch(op) {
             case OpMult:
                 var transE1 = Expressions.createBinop(OpMult, e1, transformExpr(e2));
@@ -98,6 +89,9 @@ class Derivatives {
         return Expressions.createBinop(op, e1, e2);
     }
 
+    private static function transformArray(e1 : Expr, e2 : Expr) : Expr {
+        return Expressions.createArray(transformExpr(e1), e2);
+    }
 }
 
 #end
