@@ -51,7 +51,24 @@ class ForwardMode {
             case EWhile(econd, expr, normalWhile):
                 return Expressions.createWhile(econd, expr, normalWhile);
             case EFor(it, expr):
-                return Expressions.createFor(it, transform(expr));
+                var newExprs = [];
+                switch(it.expr) {
+                    case EBinop(OpIn, e1, _):
+                        switch(e1.expr) {
+                            case EConst(CIdent(f)):
+                                var vars = Expressions.createVars([{
+                                    name: 'd' + f,
+                                    type: null,
+                                    expr: Expressions.createConstant(CInt('0')),
+                                    isFinal: false
+                                }]);
+                                newExprs.push(vars);
+                            default:
+                        }
+                    default:
+                }
+                newExprs.push(Expressions.createFor(it, transform(expr)));
+                return Expressions.createBlock(newExprs);
             case EReturn(expr):
                 return Expressions.createReturn(transform(expr));
             case EIf(econd, eif, eelse):
