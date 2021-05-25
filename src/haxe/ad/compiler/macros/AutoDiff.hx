@@ -1,12 +1,16 @@
 package haxe.ad.compiler.macros;
 
 #if macro
+import haxe.ds.StringMap;
 import haxe.macro.Context;
+import haxe.macro.Expr;
 import haxe.macro.Expr.Field;
 import haxe.macro.Expr.Function;
 import haxe.macro.Expr.FieldType;
 
 class AutoDiff {
+    private static var _params : StringMap<String>;
+
     public static function buildForward() : Array<Field> {
         return build(ForwardMode.perform);
     }
@@ -26,6 +30,7 @@ class AutoDiff {
 
             switch(field.kind) {
                 case FieldType.FFun(fn):
+                    _params = new StringMap();
                     var newField : Field = {
                         name: field.name + 'Diff',
                         access: field.access,
@@ -40,5 +45,26 @@ class AutoDiff {
 
         return newFields;
     }  
+    
+    public static function checkParameter(e1 : Expr) : Bool {
+        var def = e1.expr;
+        switch(def) {
+            case EConst(CIdent(f)):
+                return _params.exists(f);
+            default:
+        }
+        return false;
+    }
+
+    public static function addParameter(v : Var) : Bool {
+        switch(v.type) {
+            case TPath(p):
+                if(p.name == 'Parameter')
+                    _params.set(p.name, p.name);
+                return true;
+            default:
+                return false;
+        }
+    }
 }
 #end

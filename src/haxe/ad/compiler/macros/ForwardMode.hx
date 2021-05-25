@@ -1,11 +1,13 @@
 package haxe.ad.compiler.macros;
 
 #if macro
+import haxe.ds.StringMap;
 import haxe.macro.Expr.Function;
 import haxe.macro.Expr;
 import haxe.macro.Context;
 
 class ForwardMode {
+
     public static function perform(func : Function) : Function {
         var newArgs = [];
         for(arg in func.args) {
@@ -37,16 +39,17 @@ class ForwardMode {
                 }
                 return Expressions.createBlock(transExpr);
             case EVars(vars):
-                trace(vars);
                 var transVars = [];
                 for(v in vars) {
                     transVars.push(v);
-                    transVars.push({
-                        name: 'd' + v.name,
-                        type: v.type,
-                        expr: transform(v.expr),
-                        isFinal: v.isFinal
-                    });
+                    if(!AutoDiff.addParameter(v)) {
+                        transVars.push({
+                            name: 'd' + v.name,
+                            type: v.type,
+                            expr: transform(v.expr),
+                            isFinal: v.isFinal
+                        });
+                    }
                 }
                 return Expressions.createVars(transVars);
             case EWhile(econd, expr, normalWhile):
@@ -91,5 +94,6 @@ class ForwardMode {
         
         return expr;
     }
+    
 }
 #end
