@@ -1,4 +1,4 @@
-package haxe.ad.duals;
+package haxe.ad.duals.forward;
 
 class Components {
     public var v : Float;
