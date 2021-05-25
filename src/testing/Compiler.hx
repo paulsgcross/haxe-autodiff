@@ -1,7 +1,5 @@
 package testing;
 
-import haxe.ad.compiler.Parameter;
-
 class Compiler {
     static function main() {
         trace(Test.funcFor(2.0, 2.0));
@@ -28,8 +26,7 @@ class Test {
   }
 
   @:diff public static function funcFor(x : Float, y : Float) : Float {
-    var N : Parameter = 10.0;
-    var f = N + (x*y);
+    var f = (x*y);
 
     return f;
   }

@@ -42,14 +42,12 @@ class ForwardMode {
                 var transVars = [];
                 for(v in vars) {
                     transVars.push(v);
-                    if(!AutoDiff.addParameter(v)) {
-                        transVars.push({
-                            name: 'd' + v.name,
-                            type: v.type,
-                            expr: transform(v.expr),
-                            isFinal: v.isFinal
-                        });
-                    }
+                    transVars.push({
+                        name: 'd' + v.name,
+                        type: v.type,
+                        expr: transform(v.expr),
+                        isFinal: v.isFinal
+                    });
                 }
                 return Expressions.createVars(transVars);
             case EWhile(econd, expr, normalWhile):

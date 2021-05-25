@@ -69,6 +69,7 @@ class Derivatives {
     }
 
     private static function transformBinop(op : Binop, e1 : Expr, e2 : Expr) : Expr {
+        /*
         switch[AutoDiff.checkParameter(e1), AutoDiff.checkParameter(e2)] {
             case [true, true]:
                 return Expressions.createBinop(op, e1, e2);
@@ -78,7 +79,7 @@ class Derivatives {
                 return Expressions.createBinop(op, e1, e2);
             default:
         }
-
+*/
         switch(op) {
             case OpMult:
                 var transE1 = Expressions.createBinop(OpMult, e1, transformExpr(e2));
