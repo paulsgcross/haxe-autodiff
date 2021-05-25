@@ -7,7 +7,7 @@ abstract Gradient(Vector<Float>) {
         this = new Vector(length);
     }
 
-    public static inline function calculate(dual : Variable) : Gradient {
+    public static inline function calculateGrad(dual : Variable) : Gradient {
         var len = dual.list.len();
         var out = new Gradient(len);
 

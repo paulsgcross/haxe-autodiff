@@ -1,29 +1,13 @@
-package testing;
+package testing.forward;
 
-import haxe.ad.duals.reverse.VariableMath;
-import haxe.ad.duals.reverse.Gradient;
-import haxe.ad.duals.reverse.Variable;
-import haxe.ad.duals.reverse.WengertList;
-import haxe.ds.Vector;
-import haxe.ad.duals.*;
-
+import haxe.ad.duals.forward.DualNumber;
+using haxe.ad.duals.forward.DualMath;
 
 class Duals {
   static function main() {
-    testMacros();
+    testDuals();
   }
 
-  private static function testMacros() {
-    var list = new WengertList();
-    var x = list.createVariable(1.0);
-    var y = list.createVariable(0.5);
-    var z = x * y + VariableMath.sin(x);
-    var gz = Gradient.calculate(z);//.grad();
-
-    trace(gz.wrt(x));
-  }
-}
-  /*
   private static function testDuals() {
     var v = Math.PI/4;
     var dual1 = new DualNumber(v, 1.0);
@@ -48,6 +32,9 @@ class Duals {
 
   private static var index : Int = 0;
   private static function quickAssertEquals(left : Float, right : Float) : Void {
+    var left = left > 1e-6?left:0.0;
+    var right = right > 1e-6?right:0.0;
+
     var string = Std.string(left) + " == " + Std.string(right);
 
     if(left != right)
@@ -66,4 +53,3 @@ private class SomeFunctions {
     into.setToDual(f);
   }
 }
-*/
