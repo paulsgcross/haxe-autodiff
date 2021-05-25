@@ -1,27 +1,19 @@
-package testing;
+package testing.forward;
 
-import haxe.ds.Vector;
-import haxe.ad.duals.DualMath;
-import haxe.ad.duals.DualNumber;
+import haxe.ad.duals.forward.DualNumber;
+using haxe.ad.duals.forward.DualMath;
 
 class Duals {
   static function main() {
-    testMacros();
-  }
-
-  private static function testMacros() {
-    var x = new DualNumber(1.0, 1.0);
-    var out = new DualNumber(0.0, 0.0);
-
-    SomeFunctions.test1_dual(x, out);
-
-    trace(out);
+    testDuals();
   }
 
   private static function testDuals() {
     var v = Math.PI/4;
     var dual1 = new DualNumber(v, 1.0);
     
+    quickAssertEquals((0.0 - dual1).v, -dual1.v);
+
     quickAssertEquals((dual1 - dual1).d, 0.0);
     quickAssertEquals((dual1 + dual1).d, 2.0);
     quickAssertEquals((dual1*dual1).d, 2*v);
@@ -40,6 +32,9 @@ class Duals {
 
   private static var index : Int = 0;
   private static function quickAssertEquals(left : Float, right : Float) : Void {
+    var left = left > 1e-6?left:0.0;
+    var right = right > 1e-6?right:0.0;
+
     var string = Std.string(left) + " == " + Std.string(right);
 
     if(left != right)

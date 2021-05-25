@@ -1,6 +1,6 @@
-package haxe.ad.duals;
+package haxe.ad.duals.forward;
 
-import haxe.ad.duals.Components;
+import haxe.ad.duals.forward.Components;
 
 abstract DualNumber(Components) to Components from Components {
 
@@ -9,6 +9,11 @@ abstract DualNumber(Components) to Components from Components {
 
     public inline function new(v : Float, d : Float) {
         this = new Components(v, d);
+    }
+
+    @:op(-A)
+    public inline function neg() : DualNumber {
+        return new DualNumber(-v, -d);
     }
 
     @:commutative
