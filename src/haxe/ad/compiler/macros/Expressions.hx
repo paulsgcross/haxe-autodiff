@@ -1,4 +1,4 @@
-package haxe.ad.compiler;
+package haxe.ad.compiler.macros;
 
 #if macro
 import haxe.macro.Context;

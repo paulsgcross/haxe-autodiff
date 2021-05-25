@@ -1,4 +1,4 @@
-package haxe.ad.compiler;
+package haxe.ad.compiler.macros;
 
 #if macro
 import haxe.macro.Expr.Function;
@@ -37,6 +37,7 @@ class ForwardMode {
                 }
                 return Expressions.createBlock(transExpr);
             case EVars(vars):
+                trace(vars);
                 var transVars = [];
                 for(v in vars) {
                     transVars.push(v);

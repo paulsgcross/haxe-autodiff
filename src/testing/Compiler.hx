@@ -1,5 +1,7 @@
 package testing;
 
+import haxe.ad.compiler.Parameter;
+
 class Compiler {
     static function main() {
         trace(Test.funcMult(2.0, 2.0));
@@ -13,7 +15,7 @@ class Compiler {
     }
 }
 
-@:build(haxe.ad.compiler.AutoDiff.buildForward())
+@:build(haxe.ad.compiler.macros.AutoDiff.buildForward())
 class Test {
   
   @:diff public static function funcMult(x : Float, y : Float) : Float {
@@ -32,9 +34,8 @@ class Test {
   }
 
   @:diff public static function funcFor(x : Float, y : Float) : Float {
-    var f = 0.0;
-    for(i in 0...100)
-        f += i*0.4;
+    var N : Parameter = 10.0;
+    var f = (x*y);
 
     return f;
   }
