@@ -1,9 +1,14 @@
 package testing;
 
+import haxe.ds.Vector;
+
 class Compiler {
     static function main() {
-        trace(Test.funcFor(2.0, 2.0));
-        trace(Test.funcForDiff(2.0, 1.0, 2.0, 0.0));
+      var out = new Vector<Float>(4);
+      var dout = new Vector<Float>(4);
+      Test.rotateDiff(Math.PI/4, 1.0, out, dout);
+      trace(out);
+      trace(dout);
     }
 }
 
@@ -18,14 +23,14 @@ class Test {
     return f + g + h;
   }
 
-  public static function funcTrig(x : Float, y : Float) : Float {
-    var f = Math.pow(Math.sin(x), 2);
-    var g = Math.pow(Math.cos(x), 2);
-
-    return f + g;
+  @:diff public static function rotate(angle : Float, out : Vector<Float>) : Void {
+    out[0] = Math.cos(angle);
+    out[1] = Math.sin(angle);
+    out[2] = Math.sin(-angle);
+    out[3] = Math.cos(angle);
   }
 
-  @:diff public static function funcFor(x : Float, y : Float) : Float {
+  public static function funcFor(x : Float, y : Float) : Float {
     var f = (x*y);
 
     return f;
