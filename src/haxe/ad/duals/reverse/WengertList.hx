@@ -8,9 +8,9 @@ final class WengertList {
         _list = new Array();
     }
 
-    public function createVar(value : Float) : DualNumber {
+    public function createVariable(value : Float) : Variable {
         var node = new Node(0, 0, 0.0, 0.0);
-        return new DualNumber(value, add(node), this);
+        return new Variable(value, add(node), this);
     }
 
     public function add(node : Node) : Int {

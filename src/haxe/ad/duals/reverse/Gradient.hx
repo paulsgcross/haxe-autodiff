@@ -7,17 +7,35 @@ abstract Gradient(Vector<Float>) {
         this = new Vector(length);
     }
 
+    public static inline function calculate(dual : Variable) : Gradient {
+        var len = dual.list.len();
+        var out = new Gradient(len);
+
+        out[dual.index] = 1.0;
+
+        for(i in 0...len) {
+            var j = len - (i + 1);
+            var node = dual.list.get(j);
+            var deriv = out[j];
+
+            out[node.leftIndex] += node.leftValue * deriv;
+            out[node.rightIndex] += node.rightValue * deriv;
+        }
+
+        return out;
+    }
+
     @:op([])
-    public function set(index : Int, value : Float) : Void {
+    public inline function set(index : Int, value : Float) : Void {
         this.set(index, value);
     }
 
     @:op([])
-    public function get(index : Int) : Float {
+    public inline function get(index : Int) : Float {
         return this.get(index);
     }
 
-    public function wrt(variable : DualNumber) : Float {
+    public inline function wrt(variable : Variable) : Float {
         return this[variable.index];
     }
 }
