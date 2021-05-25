@@ -2,6 +2,9 @@ package testing.forward;
 
 import haxe.ds.Vector;
 
+// TODO: Add log transformation.
+// TODO: Add reverse mode?
+
 class Compiler {
     static function main() {
       trace(Test.funcMult(3.0));

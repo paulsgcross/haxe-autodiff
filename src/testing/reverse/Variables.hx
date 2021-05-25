@@ -9,6 +9,8 @@ import haxe.ad.duals.*;
 
 using haxe.ad.duals.reverse.Gradient;
 
+// TODO: Optimise this implementation.
+
 class Variables {
   static function main() {
     test();
