@@ -82,5 +82,13 @@ class Expressions {
             pos: Context.currentPos()
         }
     }
+    
+    public static function createArray(e1 : Expr, e2 : Expr) : Expr {
+        return {
+            expr: ExprDef.EArray(e1, e2),
+            pos: Context.currentPos()
+        }
+    }
+
 }
 #end
