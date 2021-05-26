@@ -1,19 +1,17 @@
 package haxe.ad.duals.reverse;
 
 final class Node {
-    public var leftIndex(default, null) : Int;
-    public var rightIndex(default, null) : Int;
-    public var leftValue(default, null) : Float;
-    public var rightValue(default, null) : Float;
+    
+    public var list(default, null) : WengertList;
+    public var value(default, null) : Float;
+    public var index(default, null) : Int;
+    public var parents(default, null) : NodeParents;
 
-    public inline function new(leftIndex : Int, rightIndex : Int, leftValue : Float, rightValue : Float) {
-        this.leftIndex = leftIndex;
-        this.rightIndex = rightIndex;
-        this.leftValue = leftValue;
-        this.rightValue = rightValue;
+    public inline function new(value : Float, list : WengertList) {
+        this.value = value;
+        this.list = list;
+        this.index = list.add(this);
+        this.parents = new NodeParents();
     }
 
-    public function toString() : String {
-        return '(' + this.leftIndex + ', ' + this.rightIndex + ')';
-    }
 }

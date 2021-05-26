@@ -7,7 +7,7 @@ abstract Gradient(Vector<Float>) {
         this = new Vector(length);
     }
 
-    public static inline function calculateGrad(dual : Variable) : Gradient {
+    public static function calculateGrad(dual : Variable) : Gradient {
         var len = dual.list.len();
         var out = new Gradient(len);
 
@@ -18,8 +18,8 @@ abstract Gradient(Vector<Float>) {
             var node = dual.list.get(j);
             var deriv = out[j];
 
-            out[node.leftIndex] += node.leftValue * deriv;
-            out[node.rightIndex] += node.rightValue * deriv;
+            out[node.parents.leftIndex] += node.parents.leftValue * deriv;
+            out[node.parents.rightIndex] += node.parents.rightValue * deriv;
         }
 
         return out;
