@@ -58,6 +58,8 @@ class Derivatives {
                         return FieldDerivatives.differentiateExp(e, params);
                     case 'pow':
                         return FieldDerivatives.differentiatePow(e, params);
+                    case 'log':
+                        return FieldDerivatives.differentiateLog(e, params);
                     default: 
                 }
             default:
