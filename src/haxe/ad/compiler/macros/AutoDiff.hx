@@ -15,6 +15,10 @@ class AutoDiff {
         return build(ForwardMode.perform);
     }
     
+    public static function buildReverse() : Array<Field> {
+        return build(ReverseMode.perform);
+    }
+    
     private static function build(method : Function -> Function) : Array<Field> {
         var fields = Context.getBuildFields();
         var newFields : Array<Field> = new Array();
