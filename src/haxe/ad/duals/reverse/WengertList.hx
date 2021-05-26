@@ -9,8 +9,8 @@ final class WengertList {
     }
 
     public function createVariable(value : Float) : Variable {
-        var node = new Node(0, 0, 0.0, 0.0);
-        return new Variable(value, add(node), this);
+        var variable = new Variable(value, this);
+        return variable;
     }
 
     public function add(node : Node) : Int {

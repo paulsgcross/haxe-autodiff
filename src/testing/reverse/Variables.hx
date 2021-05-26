@@ -18,9 +18,11 @@ class Variables {
 
   private static function test() {
     var list = new WengertList();
+
     var x = list.createVariable(2.0);
     var y = list.createVariable(0.5);
-    var z = 3.0 - (x / y);
+    var z = x*x + 3.0*x - 3.0;
+
     var gz = z.calculateGrad();
 
     trace(gz.wrt(x));
