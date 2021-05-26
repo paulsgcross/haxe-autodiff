@@ -52,5 +52,10 @@ class FieldDerivatives {
         
         return Expressions.createBinop(Binop.OpMult, Derivatives.transformExpr(in_params[0]), call);
     }
+
+    public static function differentiateLog(expr : Expr,  in_params : Array<Expr>) : Expr {
+        return Expressions.createBinop(Binop.OpDiv, Derivatives.transformExpr(in_params[0]), in_params[0]);
+    }
+
 }
 #end

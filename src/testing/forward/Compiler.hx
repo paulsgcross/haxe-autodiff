@@ -34,8 +34,9 @@ class Test {
   
   @:diff public static function funcMult(x : Float) : Float {
     var f = Math.exp(-x*x);
+    var g = Math.log(1 + x);
     
-    return f;
+    return f + g;
   }
 
   @:diff public static function rotate(angle : Float, out : Vector<Float>) : Void {
