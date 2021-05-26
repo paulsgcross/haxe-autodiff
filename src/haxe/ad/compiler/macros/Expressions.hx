@@ -13,6 +13,15 @@ class Expressions {
         }
     }
 
+    public static function createVar(name : String, expr : Expr) : Var {
+        return {
+            name: name,
+            type: null,
+            expr: expr,
+            isFinal: true
+        }
+    }
+
     public static function createVars(vars : Array<Var>) : Expr {
         return {
             expr: ExprDef.EVars(vars),
