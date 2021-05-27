@@ -2,80 +2,125 @@ package haxe.ad.compiler.macros;
 
 
 #if macro
-import haxe.ds.StringMap;
+import haxe.ds.Vector;
 import haxe.macro.Expr.Function;
 import haxe.macro.Expr;
 import haxe.macro.Context;
+import haxe.ad.compiler.macros.reverse.*;
 
 class ReverseMode {
 
-    private static var _list : Array<Expr>;
+    // TODO: Add derivatives
+    // TODO: Mark input arguments as first variables
+    // TODO: Prevent re-definitions
 
     public static function perform(func : Function) : Function {
-        _list = new Array();
+        var graph = {inputs: new Map(), nodes: []};
 
-        transform(func.expr);
-
-        var newArgs = func.args;
-        var newExpr = construct(_list);
-        var newRet = func.ret;
+        handleInputVars(func.args, graph);
+        forwardPass(func.expr, graph);
+        
+        var exprs = [];
+        for(node in graph.nodes) {
+            exprs.push(Expressions.createVars([Expressions.createVar(node.name, node.expr)]));
+        }
+        exprs.push(func.expr);
+        var newArgs = processArguments(func.args);
+        var newExpr = Expressions.createBlock(exprs);//reversePass(graph, newArgs.length-1);
         
         return {
             args: newArgs,
             expr: newExpr,
-            ret: newRet
+            ret: null
         };
     }
 
-    private static function transform(expr : Expr) : Void {
+    private static function processArguments(args : Array<FunctionArg>) : Array<FunctionArg> {
+        var newArgs = [];
+        for(arg in args) {
+            newArgs.push(arg);
+        }
+
+        newArgs.push({
+            name: 'gradient',
+            type: TPath({
+                pack: [],
+                name: 'Vector',
+                params: [TPType(TPath({
+                    pack: [],
+                    name: 'Float'
+                }))]
+            })
+        });
+
+        return newArgs;
+    }
+
+    private static function handleInputVars(args : Array<FunctionArg>, graph : Graph) {
+        for(arg in args) {
+            var name = 'w' + graph.nodes.length;
+            var node = createNode(name, Expressions.createConstant(CIdent(arg.name)));
+            graph.inputs.set(arg.name, graph.nodes.length);
+            graph.nodes.push(node);
+        }
+    }
+
+    public static function createNode(name : String, expr : Expr) : Node {
+        return {name: name, ref: Expressions.createConstant(CIdent(name)), expr: expr, leftParent: 0, rightParent: 0};
+    }
+
+    /*
+    private static function reversePass(graph : Graph, count : Int) : Expr {
+        var len = graph.derivitives.length;
+        var derivs = graph.derivitives;
+        var exprs = graph.expressions;
+
+        var out = new Vector<Expr>(len);
+        for(i in 0...len) {
+            out[i] = Expressions.createConstant(CFloat('0.0'));
+        }
+        
+        out[len-1] = Expressions.createConstant(CFloat('1.0'));
+        
+        for(i in 0...len) {
+            var j = len - (i + 1);
+            var parents = derivs[j];
+            var prev = out[j];
+            
+            if(parents.left != null) {
+                var expr = Expressions.createBinop(OpMult, Expressions.createConstant(parents.left), prev);
+                out[parents.leftidx] = Expressions.createBinop(OpAdd, out[parents.leftidx], expr);
+            }
+
+            if(parents.right != null) {
+                var expr = Expressions.createBinop(OpMult, Expressions.createConstant(parents.right), prev);
+                out[parents.rightidx] = Expressions.createBinop(OpAdd, out[parents.rightidx], expr);
+            }
+        }
+        
+        exprs.push(Expressions.createVars([Expressions.createVar('out0', out[0])]));
+        exprs.push(Expressions.createVars([Expressions.createVar('out1', out[1])]));
+
+        return Expressions.createBlock(exprs);
+    }
+    */
+    private static function forwardPass(expr : Expr, graph : Graph) : Void {
         var def = expr.expr;
         
         switch(def) {
             case EBlock(es):
+                var exprs = [];
                 for(e in es) {
-                    transform(e);
+                    exprs.push(forwardPass(e, graph));
                 }
             case EReturn(e):
-                _list.push(expr);
-
-                transform(e);
-            case EVars(vars):
-                for(v in vars) {
-                    transform(v.expr);
-                }    
-            case EBinop(op, e1, e2):
-                _list.push(transformBinop(op, e1, e2));
-
-                transform(e1);
-                transform(e2);
-            case EConst(c):
-                _list.push(expr);
-            case ECall(e, params):
-                _list.push(expr);
+                forwardPass(e, graph);
+            case EBinop(_, _, _), ECall(_, _), EConst(_):
+                Derivatives.transformExpr(expr, graph);
             default:
         }
     }
 
-    private static function construct(list : Array<Expr>) : Expr {
-        var len = list.length;
-        var exprs = [];
-        for(i in 0...len) {
-            var j = len - (i + 1);
-            var expr = list[j];
-            exprs.push(expr);
-        }
-        
-        return Expressions.createBlock(exprs);
-    }
-
-    private static function transformBinop(op : Binop, e1 : Expr, e2 : Expr) : Expr {
-        switch(op) {
-            case OpMult:
-                var v = Expressions.createVar('g', Expressions.createBinop(OpAdd, e1, e2));
-                return Expressions.createVars([v]);
-            default:
-        }
-        return Expressions.createBinop(op, e1, e2);
-    }
 }
+
 #end
