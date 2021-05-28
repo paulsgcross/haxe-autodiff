@@ -10,10 +10,6 @@ import haxe.ad.compiler.macros.reverse.*;
 
 class ReverseMode {
 
-    // TODO: Add derivatives
-    // TODO: Mark input arguments as first variables
-    // TODO: Prevent re-definitions
-
     public static function perform(func : Function) : Function {
         var graph = {inputs: new Map(), nodes: []};
 
@@ -144,7 +140,7 @@ class ReverseMode {
                 }
             case EReturn(e):
                 forwardPass(e, graph);
-            case EBinop(_, _, _), ECall(_, _), EConst(_):
+            case EBinop(_, _, _), EParenthesis(_), ECall(_, _), EConst(_):
                 ForwardPass.evaluate(expr, graph);
             default:
         }
