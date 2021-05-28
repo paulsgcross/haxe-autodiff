@@ -2,8 +2,6 @@ package testing.forward;
 
 import haxe.ds.Vector;
 
-// TODO: Add reverse mode?
-
 class Compiler {
     static function main() {
       trace(Test.funcMult(3.0));
