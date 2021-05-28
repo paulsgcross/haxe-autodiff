@@ -17,7 +17,10 @@ class Compiler {
 class Test {
   
   @:diff public static function square(x : Float, y : Float) : Float {
-    return Math.cos(x) + x*Math.exp(y);
+    for(i in 0...3) {
+      x += Math.cos(y);
+    }
+    return x*y;
   }
 
 }

@@ -40,11 +40,18 @@ class Derivatives {
         switch(e.expr) {
             case EField(e, field):
                 switch(field) {
+                    case 'sin':
+                        return FieldDerivatives.differentiateSin(e, params);
                     case 'cos':
-                        var e1 = Expressions.createCall(Expressions.createField(e, 'sin'), params);
-                        return {left: Expressions.createUnop(OpNeg, false, e1), right: null};
+                        return FieldDerivatives.differentiateCos(e, params);
+                    case 'tan':
+                        return FieldDerivatives.differentiateTan(e, params);
+                    case 'pow':
+                        return FieldDerivatives.differentiatePow(e, params);
                     case 'exp':
-                        return {left: Expressions.createCall(Expressions.createField(e, 'exp'), params), right: null};
+                        return FieldDerivatives.differentiateExp(e, params);
+                    case 'log':
+                        return FieldDerivatives.differentiateLog(e, params);
                     default:
                 }
             default:

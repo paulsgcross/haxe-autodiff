@@ -123,8 +123,6 @@ class ReverseMode {
             );
 
             result.push(Expressions.createBinop(OpAssign, array, out[i]));
-            //result.push(Expressions.createVar('out', out[i]));
-            //result.push(Expressions.createArray(Expressions.createConstant(CInt(i)), out[i]))
         }
 
         return Expressions.createBlock(result);
