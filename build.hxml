@@ -1,5 +1,5 @@
 --class-path src/
---main testing.reverse.Compiler
+--main testing.forward.Compiler
 --cpp bin/cpp/
 --dce full
 --debug
