@@ -55,7 +55,7 @@ class Test {
     return f;
   }
 
-  @:reverseDiff public static function square(x : Float) : Float {
+  @:forwardDiff public static function square(x : Float) : Float {
     return x*x;
   }
 

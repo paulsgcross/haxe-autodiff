@@ -2,8 +2,6 @@ package testing.reverse;
 
 import haxe.ds.Vector;
 
-// TODO: Add reverse mode?
-
 class Compiler {
     static function main() {
       var grad = new Vector<Float>(2);
@@ -13,10 +11,10 @@ class Compiler {
     }
 }
 
-@:build(haxe.ad.compiler.macros.AutoDiff.buildReverse())
+@:build(haxe.ad.compiler.macros.AutoDiff.build())
 class Test {
   
-  @:diff public static function square(x : Float, y : Float) : Float {
+  @:reverseDiff public static function square(x : Float, y : Float) : Float {
     return x*Math.sqrt(x);
   }
 
