@@ -1,59 +1,55 @@
 package haxe.ad.compiler.macros.reverse;
 
 #if macro
-import haxe.macro.Expr.Function;
 import haxe.macro.Expr;
-import haxe.macro.Context;
+import haxe.ad.compiler.macros.Expressions;
 
 class Derivatives {
-    public static function transformExpr(expr : Expr, graph : Graph) : Node {
-        var def = expr.expr;
-        
-        switch(def) {
+    
+    public static function create(expr : Expr) : Deriv {
+        switch(expr.expr) {
             case EBinop(op, e1, e2):
-                var node1 = transformExpr(e1, graph);
-                var node2 = transformExpr(e2, graph);
-
-                var idx = graph.nodes.length;
-                var parent = {leftidx: node1.idx, rightidx: node2.idx};
-                var name = 'w' + graph.nodes.length;
-                var node = ReverseMode.createNode(idx, name, Expressions.createBinop(op, node1.ref, node2.ref), parent);
-                graph.nodes.push(node);
-                return node;
+                return createBinopDerivatives(op, e1, e2);
             case ECall(e, params):
-                var newParams = [];
-                for(param in params) {
-                    newParams.push(param);
-                }
-                var node = transformExpr(newParams[0], graph);
-                newParams[0] = node.ref;
-
-                var idx = graph.nodes.length;
-                var parent = {leftidx: node.idx, rightidx: null};
-                var name = 'w' + graph.nodes.length;
-                var node = ReverseMode.createNode(idx, name, Expressions.createCall(e, newParams), parent);
-                graph.nodes.push(node);
-                return node;
-            case EConst(c):
-                switch(c) {
-                    case CIdent(s):
-                        var idx = graph.inputs.get(s);
-                        if(idx != null) {
-                            return graph.nodes[idx];
-                        }
-                    default:
-                }
-                
-                var idx = graph.nodes.length;
-                var name = 'w' + graph.nodes.length;
-                var parent = {leftidx: null, rightidx: null};
-                var node = ReverseMode.createNode(idx, name, Expressions.createConstant(c), parent);
-                graph.nodes.push(node);
-                return node;
+                return createFieldDerivatives(e, params);
             default:
-                return null;
         }
+        return null;
     }
 
+    private static function createBinopDerivatives(op : Binop, e1 : Expr, e2 : Expr) : Deriv {
+        switch(op) {
+            case OpAdd:
+                return {left: Expressions.createConstant(CFloat('1.0')), right: Expressions.createConstant(CFloat('1.0'))};
+            case OpSub:
+                return {left: Expressions.createConstant(CFloat('1.0')), right: Expressions.createConstant(CFloat('-1.0'))};
+            case OpMult:
+                return {left: e2, right: e1};
+            case OpDiv:
+                var le = Expressions.createBinop(OpDiv, Expressions.createConstant(CFloat('1.0')), e2);
+                var re = Expressions.createUnop(Unop.OpNeg, false, e1);
+                var denom = Expressions.createBinop(OpMult, e2, e2);
+                re = Expressions.createBinop(OpDiv, re, denom);
+                return {left: le, right: re};
+            default:
+        }
+        return null;
+    }
+
+    private static function createFieldDerivatives(e : Expr, params : Array<Expr>) : Deriv {
+        switch(e.expr) {
+            case EField(e, field):
+                switch(field) {
+                    case 'cos':
+                        var e1 = Expressions.createCall(Expressions.createField(e, 'sin'), params);
+                        return {left: Expressions.createUnop(OpNeg, false, e1), right: null};
+                    case 'exp':
+                        return {left: Expressions.createCall(Expressions.createField(e, 'exp'), params), right: null};
+                    default:
+                }
+            default:
+        }
+        return null;
+    }
 }
 #end

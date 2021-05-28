@@ -24,10 +24,8 @@ class ReverseMode {
         for(node in graph.nodes) {
             exprs.push(Expressions.createVars([Expressions.createVar(node.name, node.expr)]));
         }
-        exprs.push(func.expr);
 
-        //var expr = reversePass(graph, func.args.length);
-        //exprs.push(expr);
+        exprs.push(reversePass(graph, func.args.length));
 
         var newArgs = processArguments(func.args);
         var newExpr = Expressions.createBlock(exprs);
@@ -64,7 +62,8 @@ class ReverseMode {
         for(arg in args) {
             var idx = graph.nodes.length;
             var name = 'w' + idx;
-            var node = createNode(idx, name, Expressions.createConstant(CIdent(arg.name)), null);
+            var parent = {leftidx: null, rightidx: null};
+            var node = createNode(idx, name, Expressions.createConstant(CIdent(arg.name)), parent);
             graph.inputs.set(arg.name, idx);
             graph.nodes.push(node);
         }
@@ -79,44 +78,60 @@ class ReverseMode {
             parents: parents
         };
     }
-    /*
+    
     private static function reversePass(graph : Graph, count : Int) : Expr {
         var len = graph.nodes.length;
         var nodes = graph.nodes;
-        var exprs = [];
+        
+        var out = [];
 
-        var out = new Vector<Expr>(len);
-        for(i in 0...len) {
-            out[i] = Expressions.createConstant(CFloat('0.0'));
+        for(i in 0...len-1) {
+            out.push(Expressions.createConstant(CFloat('0.0')));
         }
-        
-        out[len-1] = Expressions.createConstant(CFloat('1.0'));
-        
+        out.push(Expressions.createConstant(CFloat('1.0')));
+
         for(i in 0...len) {
             var j = len - (i + 1);
-            var parents = nodes[j].parents;
+            var node = nodes[j];
             var prev = out[j];
+            var deriv = Derivatives.create(node.expr);
             
-            if(parents == null)
-                continue;
+            var leftidx = node.parents.leftidx;
+            var rightidx = node.parents.rightidx;
 
-            if(parents.leftidx != null) {
-                var expr = Expressions.createBinop(OpMult, parents.leftderiv, prev);
-                out[parents.leftidx] = Expressions.createBinop(OpAdd, out[parents.leftidx], expr);
+            if(leftidx != null) {
+                if(deriv != null) {
+                    var expr = Expressions.createBinop(OpMult, deriv.left, prev);
+                    out[leftidx] = Expressions.createBinop(OpAdd, out[leftidx], expr);
+                }
             }
 
-            if(parents.rightidx != null) {
-                var expr = Expressions.createBinop(OpMult, parents.rightderiv, prev);
-                out[parents.rightidx] = Expressions.createBinop(OpAdd, out[parents.rightidx], expr);
+            if(rightidx != null) {
+                if(deriv != null) {
+                    var expr = Expressions.createBinop(OpMult, deriv.right, prev);
+                    out[rightidx] = Expressions.createBinop(OpAdd, out[rightidx], expr);
+                }
             }
+
         }
-        
-        exprs.push(Expressions.createVars([Expressions.createVar('out0', out[0])]));
-        exprs.push(Expressions.createVars([Expressions.createVar('out1', out[1])]));
 
-        return Expressions.createBlock(exprs);
+        var result = [];
+        for(i in 0...count) {
+            var array = Expressions.createArray(
+                Expressions.createConstant(CIdent('gradient')),
+                Expressions.createConstant(CInt(Std.string(i)))
+            );
+
+            result.push(Expressions.createBinop(OpAssign, array, out[i]));
+            //result.push(Expressions.createVar('out', out[i]));
+            //result.push(Expressions.createArray(Expressions.createConstant(CInt(i)), out[i]))
+        }
+
+        return Expressions.createBlock(result);
     }
-    */
+
+    
+    
     private static function forwardPass(expr : Expr, graph : Graph) : Void {
         var def = expr.expr;
         
@@ -132,7 +147,7 @@ class ReverseMode {
             case EReturn(e):
                 forwardPass(e, graph);
             case EBinop(_, _, _), ECall(_, _), EConst(_):
-                Derivatives.transformExpr(expr, graph);
+                ForwardPass.evaluate(expr, graph);
             default:
         }
     }

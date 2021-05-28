@@ -9,6 +9,7 @@ class Compiler {
       var grad = new Vector<Float>(2);
       trace(Test.square(3.0, 2.0));
       Test.squareDiff(3.0, 2.0, grad);
+      trace(grad);
     }
 }
 
@@ -16,7 +17,7 @@ class Compiler {
 class Test {
   
   @:diff public static function square(x : Float, y : Float) : Float {
-    return x*Math.sin(y) + Math.exp(y);
+    return Math.cos(x) + x*Math.exp(y);
   }
 
 }
