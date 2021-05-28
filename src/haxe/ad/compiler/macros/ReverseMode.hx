@@ -10,10 +10,6 @@ import haxe.ad.compiler.macros.reverse.*;
 
 class ReverseMode {
 
-    // TODO: Add derivatives
-    // TODO: Mark input arguments as first variables
-    // TODO: Prevent re-definitions
-
     public static function perform(func : Function) : Function {
         var graph = {inputs: new Map(), nodes: []};
 
