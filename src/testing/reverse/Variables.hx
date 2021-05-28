@@ -17,9 +17,10 @@ class Variables {
     var y = list.createVariable(0.5);
     var z = x*y + 3.0*x - 3.0*y;
 
+    trace(z.value);
+    
     var gz = z.calculateGrad();
 
-    trace(z.value);
     trace(gz.wrt(x));
     trace(gz.wrt(y));
   }

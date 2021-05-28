@@ -1,5 +1,5 @@
 --class-path src/
---main testing.reverse.Variables
+--main testing.reverse.Compiler
 --cpp bin/cpp/
 --dce full
 --debug
