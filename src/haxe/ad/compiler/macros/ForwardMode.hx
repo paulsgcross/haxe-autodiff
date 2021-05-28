@@ -1,6 +1,7 @@
 package haxe.ad.compiler.macros;
 
 #if macro
+import haxe.ad.compiler.macros.forward.Derivatives;
 import haxe.ds.StringMap;
 import haxe.macro.Expr.Function;
 import haxe.macro.Expr;

@@ -11,15 +11,7 @@ import haxe.macro.Expr.FieldType;
 class AutoDiff {
     private static var _params : StringMap<String>;
 
-    public static function buildForward() : Array<Field> {
-        return build(ForwardMode.perform);
-    }
-    
-    public static function buildReverse() : Array<Field> {
-        return build(ReverseMode.perform);
-    }
-    
-    private static function build(method : Function -> Function) : Array<Field> {
+    private static function build() : Array<Field> {
         var fields = Context.getBuildFields();
         var newFields : Array<Field> = new Array();
 
@@ -29,8 +21,14 @@ class AutoDiff {
             if(field.meta[0] == null)
                 continue;
             
-            if(field.meta[0].name != ':diff')
+            var method : Function -> Function = null;
+            if(field.meta[0].name == ':forwardDiff') {
+                method = ForwardMode.perform;
+            } else if (field.meta[0].name == ':reverseDiff') {
+                method = ReverseMode.perform;
+            } else {
                 continue;
+            }
 
             switch(field.kind) {
                 case FieldType.FFun(fn):

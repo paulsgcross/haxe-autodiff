@@ -1,4 +1,4 @@
-package haxe.ad.compiler.macros;
+package haxe.ad.compiler.macros.forward;
 
 import haxe.macro.Context;
 import haxe.macro.TypeTools;
