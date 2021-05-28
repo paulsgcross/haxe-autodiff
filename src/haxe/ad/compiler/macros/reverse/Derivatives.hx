@@ -18,6 +18,18 @@ class Derivatives {
                 var node = ReverseMode.createNode(name, Expressions.createBinop(op, node1.ref, node2.ref));
                 graph.nodes.push(node);
                 return node;
+            case ECall(e, params):
+                var newParams = [];
+                for(param in params) {
+                    newParams.push(param);
+                }
+                var node = transformExpr(newParams[0], graph);
+                newParams[0] = node.ref;
+
+                var name = 'w' + graph.nodes.length;
+                var node = ReverseMode.createNode(name, Expressions.createCall(e, newParams));
+                graph.nodes.push(node);
+                return node;
             case EConst(c):
                 switch(c) {
                     case CIdent(s):
