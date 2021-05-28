@@ -25,8 +25,12 @@ class ReverseMode {
             exprs.push(Expressions.createVars([Expressions.createVar(node.name, node.expr)]));
         }
         exprs.push(func.expr);
+
+        //var expr = reversePass(graph, func.args.length);
+        //exprs.push(expr);
+
         var newArgs = processArguments(func.args);
-        var newExpr = Expressions.createBlock(exprs);//reversePass(graph, newArgs.length-1);
+        var newExpr = Expressions.createBlock(exprs);
         
         return {
             args: newArgs,
@@ -58,22 +62,28 @@ class ReverseMode {
 
     private static function handleInputVars(args : Array<FunctionArg>, graph : Graph) {
         for(arg in args) {
-            var name = 'w' + graph.nodes.length;
-            var node = createNode(name, Expressions.createConstant(CIdent(arg.name)));
-            graph.inputs.set(arg.name, graph.nodes.length);
+            var idx = graph.nodes.length;
+            var name = 'w' + idx;
+            var node = createNode(idx, name, Expressions.createConstant(CIdent(arg.name)), null);
+            graph.inputs.set(arg.name, idx);
             graph.nodes.push(node);
         }
     }
 
-    public static function createNode(name : String, expr : Expr) : Node {
-        return {name: name, ref: Expressions.createConstant(CIdent(name)), expr: expr, leftParent: 0, rightParent: 0};
+    public static function createNode(idx : Int, name : String, expr : Expr, parents : Parents) : Node {
+        return {
+            idx: idx,
+            name: name,
+            ref: Expressions.createConstant(CIdent(name)),
+            expr: expr,
+            parents: parents
+        };
     }
-
     /*
     private static function reversePass(graph : Graph, count : Int) : Expr {
-        var len = graph.derivitives.length;
-        var derivs = graph.derivitives;
-        var exprs = graph.expressions;
+        var len = graph.nodes.length;
+        var nodes = graph.nodes;
+        var exprs = [];
 
         var out = new Vector<Expr>(len);
         for(i in 0...len) {
@@ -84,16 +94,19 @@ class ReverseMode {
         
         for(i in 0...len) {
             var j = len - (i + 1);
-            var parents = derivs[j];
+            var parents = nodes[j].parents;
             var prev = out[j];
             
-            if(parents.left != null) {
-                var expr = Expressions.createBinop(OpMult, Expressions.createConstant(parents.left), prev);
+            if(parents == null)
+                continue;
+
+            if(parents.leftidx != null) {
+                var expr = Expressions.createBinop(OpMult, parents.leftderiv, prev);
                 out[parents.leftidx] = Expressions.createBinop(OpAdd, out[parents.leftidx], expr);
             }
 
-            if(parents.right != null) {
-                var expr = Expressions.createBinop(OpMult, Expressions.createConstant(parents.right), prev);
+            if(parents.rightidx != null) {
+                var expr = Expressions.createBinop(OpMult, parents.rightderiv, prev);
                 out[parents.rightidx] = Expressions.createBinop(OpAdd, out[parents.rightidx], expr);
             }
         }
@@ -109,9 +122,12 @@ class ReverseMode {
         
         switch(def) {
             case EBlock(es):
-                var exprs = [];
                 for(e in es) {
-                    exprs.push(forwardPass(e, graph));
+                    forwardPass(e, graph);
+                }
+            case EVars(vars):
+                for(v in vars) {
+                    forwardPass(v.expr, graph);
                 }
             case EReturn(e):
                 forwardPass(e, graph);
