@@ -7,8 +7,8 @@ import haxe.ds.Vector;
 class Compiler {
     static function main() {
       var grad = new Vector<Float>(2);
-      trace(Test.square(3.0, 2.0));
-      Test.squareDiff(3.0, 2.0, grad);
+      trace(Test.square(2.0, 2.0));
+      Test.squareDiff(2.0, 2.0, grad);
       trace(grad);
     }
 }
@@ -17,10 +17,7 @@ class Compiler {
 class Test {
   
   @:diff public static function square(x : Float, y : Float) : Float {
-    for(i in 0...3) {
-      x += Math.cos(y);
-    }
-    return x*y;
+    return Math.sqrt(x);
   }
 
 }

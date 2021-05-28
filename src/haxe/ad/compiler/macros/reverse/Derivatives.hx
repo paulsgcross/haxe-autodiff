@@ -52,6 +52,10 @@ class Derivatives {
                         return FieldDerivatives.differentiateExp(e, params);
                     case 'log':
                         return FieldDerivatives.differentiateLog(e, params);
+                    case 'abs':
+                        return FieldDerivatives.differentiateAbs(e, params);
+                    case 'sqrt':
+                        return FieldDerivatives.differentiateSqrt(e, params);
                     default:
                 }
             default:
