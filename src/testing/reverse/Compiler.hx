@@ -17,7 +17,7 @@ class Compiler {
 class Test {
   
   @:diff public static function square(x : Float, y : Float) : Float {
-    return Math.sqrt(x);
+    return x*Math.sqrt(x);
   }
 
 }
