@@ -15,7 +15,7 @@ class Compiler {
 class Test {
   
   @:reverseDiff public static function square(x : Float, y : Float) : Float {
-    return x*Math.sqrt(x);
+    return x*(Math.exp(x) + Math.exp(y));
   }
 
 }

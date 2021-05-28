@@ -10,6 +10,8 @@ class ForwardPass {
         var def = expr.expr;
         
         switch(def) {
+            case EParenthesis(e):
+                return evaluate(e, graph);
             case EBinop(op, e1, e2):
                 var node1 = evaluate(e1, graph);
                 var node2 = evaluate(e2, graph);
