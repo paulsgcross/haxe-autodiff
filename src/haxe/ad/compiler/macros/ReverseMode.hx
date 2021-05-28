@@ -129,6 +129,8 @@ class ReverseMode {
     private static function forwardPass(expr : Expr, graph : Graph) : Void {
         var def = expr.expr;
         
+        // TODO: Keep structure but create the intermediate variables here...
+        
         switch(def) {
             case EBlock(es):
                 for(e in es) {
