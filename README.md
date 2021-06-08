@@ -9,8 +9,8 @@ Beyond this, each implementation has a forward and reverse mode. The forward mod
 ## What's useful about it?
 Automatic differentiation is useful for problems in mechanics (such as physics engines) and incredibly useful for machine learning. Anywhere you need to know the derivative of a function, autodiff can be employed to calculate that derivative quickly (as opposed to symbolic differentiation) and robustly (as opposed to numerical differentiation).
 
-## How does it work?
-There are two implementations in this package. The first is operator overloading which is provided through Haxe Abstracts and is contained within the haxe.ad.duals packages. These packages also include dual versions of some Math functions.
+## How do I use it?
+There are two implementations in this package. The first is operator overloading which is provided through Haxe Abstracts and is contained within the ```haxe.ad.duals``` packages. These packages also include dual versions of some Math functions.
 
 ### Operator overloading
 
@@ -76,7 +76,7 @@ As things stand, the operator overloading implementation should be more than eno
 
 This is still in the experimental stage. Currently, forward mode differentiation works (including for loops and code branching sans switch statements) without any issues. Reverse mode only works with simple return expressions but will support loops and branching in the future. Source code transformation is preferred because it provides less runtime overhead and the Haxe compiler can optimise more easily.
 
-For forward mode, build with the AutoDiff macro and mark functions using the @:forwardDiff metadata:
+For forward mode, build with the AutoDiff macro found in ```haxe.ad.compiler.macros```, and mark functions using the @:forwardDiff metadata:
 
 ```haxe
 @:build(haxe.ad.compiler.macros.AutoDiff.build())
