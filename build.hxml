@@ -1,0 +1,7 @@
+--class-path src/
+--main examples.Compiler
+--cpp bin/cpp/
+--dce full
+--debug
+
+--library hxcpp-debug-server
