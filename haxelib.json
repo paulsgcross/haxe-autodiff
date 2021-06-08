@@ -1,0 +1,14 @@
+{
+   "name": "haxe-autodiff",
+   "url": "https://github.com/paulsgcross/haxe-autodiff",
+   "license": "MIT",
+   "classPath": "src/",
+   "tags": [
+      "utility", "math"
+   ],
+   "description": "An automatic differentiation package for Haxe",
+   "contributors": ["PaulSGCross"],
+   "releasenote": "Initial release. Includes an operator overloading library and an experimental macro library.",
+   "version": "0.0.1",
+   "dependencies": { }
+}
